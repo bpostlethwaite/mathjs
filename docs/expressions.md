@@ -22,7 +22,8 @@ Expressions can be parsed and evaluated in various ways:
 - Using the function [`math.eval(expr [,scope])`](#eval).
 - Using the function [`math.parse(expr [,scope])`](#parse).
 - By creating a [parser](#parser), `math.parser()`, which contains functions
-  `eval`, `parse`, and keeps a scope with assigned variables in memory.
+  `parse`, `compile`, and `eval`, and keeps a scope with assigned variables in
+  memory.
 
 
 ### Eval
@@ -51,7 +52,7 @@ var math = require('mathjs')();
 // evaluate expressions
 math.eval('sqrt(3^2 + 4^2)');           // 5
 math.eval('sqrt(-4)');                  // 2i
-math.eval('2 inch in cm');              // 5.08 cm
+math.eval('2 inch to cm');              // 5.08 cm
 math.eval('cos(45 deg)');               // 0.7071067811865476
 
 // provide a scope
@@ -67,21 +68,27 @@ scope.c;                                // 6.8
 ### Parse
 
 Math.js contains a function `math.parse` to parse expressions into a node
-tree. The syntax is similar to [`math.eval`](#eval):
+tree. The syntax is:
 
 ```js
 math.parse(expr)
-math.parse(expr, scope)
 math.parse([expr1, expr2, expr3, ...])
-math.parse([expr1, expr2, expr3, ...], scope)
 ```
 
 Function `parse` accepts a single expression or an array with
-expressions as first argument, and has an optional second argument
-containing a scope with variables and functions. The scope is a regular
-JavaScript Object. The scope will be used to resolve symbols, and to write
-assigned variables or function. Variables are linked dynamically to the
-provided scope.
+expressions as argument. Function parse returns a node tree, which can
+be successively compiled and evaluated:
+
+```js
+var node = math.parse(expr);      // parse expression into a node tree
+var code = node.compile(math);    // compile the node tree
+var result = code.eval([scope]);  // evaluate the code with an optional scope
+```
+
+An expression needs to be parsed and compiled only once, after which the
+expression can be evaluated repeatedly. On evaluation, an optional scope
+can be provided, which is used to resolve symbols and to write assigned
+variables or functions. Parameter `scope` is a regular Object.
 
 Example usage:
 
@@ -91,19 +98,21 @@ var math = require('mathjs')();
 
 // parse an expression into a node, and evaluate the node
 var node1 = math.parse('sqrt(3^2 + 4^2)');
-node1.eval(); // 5
+var code1 = node1.compile(math);
+code1.eval(); // 5
 
 // provide a scope
+var node2 = math.parse('x^a', scope);
+var code2 = node2.compile(math);
 var scope = {
     x: 3,
     a: 2
 };
-var node2 = math.parse('x^a', scope);
-node2.eval(); // 9
+code2.eval(scope); // 9
 
 // change a value in the scope and re-evaluate the node
 scope.a = 3;
-node2.eval(); // 27
+code2.eval(scope); // 27
 ```
 
 
@@ -125,12 +134,17 @@ The parser contains the following functions:
 
 - `clear()`
   Completely clear the parsers scope.
+- `compile(expr)`
+  Parse and compile an expression into javascript code.
+  Returns an Object with function `eval([scope])`, which when executed
+  returns the result of the expression.
 - `eval(expr)`
-  Evaluate an expression.
+  Evaluate an expression. Returns the result of the expression.s
 - `get(name)`
   Retrieve a variable or function from the parsers scope.
 - `parse(expr)`
-  Parse an expression into a node tree.
+  Parse an expression into a node tree. Returns a `Node`, which can be
+  compiled and evaluated like `node.compile(math).eval([scope])`.
 - `remove(name)`
   Remove a variable or function from the parsers scope.
 - `set(name, value)`
@@ -149,18 +163,18 @@ var parser = math.parser();
 // evaluate expressions
 parser.eval('sqrt(3^2 + 4^2)');         // 5
 parser.eval('sqrt(-4)');                // 2i
-parser.eval('2 inch in cm');            // 5.08 cm
+parser.eval('2 inch to cm');            // 5.08 cm
 parser.eval('cos(45 deg)');             // 0.7071067811865476
 
 // define variables and functions
 parser.eval('x = 7 / 2');               // 3.5
 parser.eval('x + 3');                   // 6.5
-parser.eval('function f(x, y) = x^y');  // f(x, y)
+parser.eval('f(x, y) = x^y');  // f(x, y)
 parser.eval('f(2, 3)');                 // 8
 
 // get and set variables and functions
 var x = parser.get('x');                // x = 7
-var f = parser.get('f');                // f = function
+var f = parser.get('f');                // function
 var g = f(3, 3);                        // g = 27
 parser.set('h', 500);
 parser.eval('h / 2');                   // 250
@@ -176,7 +190,7 @@ parser.clear();
 
 ## Syntax
 
-The expression parser is aimed at a a mathematical audience, not a programming
+The expression parser is aimed at a mathematical audience, not a programming
 audience. The syntax is similar to most calculators and mathematical
 applications. This is close to JavaScript as well, though there are a few
 important differences between the syntax of the expression parser and the
@@ -216,8 +230,8 @@ The following operators are available:
 
 Operator    | Name                  | Syntax    | Associativity | Example               | Result
 ----------- | --------------------- | --------- | ------------- | --------------------- | ---------------
-`(`, `)`    | Parentheses, index    | `(x)`     | None          | `2 * (3 + 4)`         | `14`
-`[`, `]`    | Matrix                | `[...]`   | None          | `[[1,2],[3,4]]`       | `[[1,2],[3,4]]`
+`(`, `)`    | Parentheses           | `(x)`     | None          | `2 * (3 + 4)`         | `14`
+`[`, `]`    | Matrix, Index         | `[...]`   | None          | `[[1,2],[3,4]]`       | `[[1,2],[3,4]]`
 `,`         | Parameter separator   | `x, y`    | None          | `max(2, 1, 5)`        | `5`
 `;`         | Statement separator   | `x; y`    | Left to right | `a=2; b=3; a*b`       | `[6]`
 `;`         | Row separator         | `[x, y]`  | Left to right | `[1,2;3,4]`           | `[[1,2],[3,4]]`
@@ -236,7 +250,7 @@ Operator    | Name                  | Syntax    | Associativity | Example       
 `!`         | Factorial             | `y!`      | None          | `5!`                  | `120`
 `=`         | Assignment            | `x = y`   | Right to left | `a = 5`               | `5`
 `:`         | Range                 | `x : y`   | None          | `1:4`                 | `[1,2,3,4]`
-`in`        | Unit conversion       | `x in y`  | Left to right | `2 inch in cm`        | `5.08 cm`
+`to`, `in`  | Unit conversion       | `x to y`  | Left to right | `2 inch to cm`        | `5.08 cm`
 `==`        | Equal                 | `x == y`  | Left to right | `2 == 4 - 2`          | `true`
 `!=`        | Unequal               | `x != y`  | Left to right | `2 != 3`              | `true`
 `<`         | Smaller               | `x < y`   | Left to right | `2 < 3`               | `true`
@@ -253,11 +267,12 @@ Operators                         | Description
 `!`                               | Factorial
 `^`, `.^`                         | Exponentiation
 `-`                               | Unary
+`x unit`                          | Unit
 `*`, `/`, `.*`, `./`, `%`, `mod`  | Multiply, divide, modulus
 `+`, `-`                          | Add, subtract
 `:`                               | Range
 `==`, `!=`, `<`, `>`, `<=`, `>=`  | Comparison
-`in`                              | Unit conversion
+`to`, `in`                        | Unit conversion
 `=`                               | Assignment
 `,`                               | Parameter and column separator
 `;`                               | Row separator
@@ -268,7 +283,7 @@ Operators                         | Description
 
 Functions are called by entering their name, followed by zero or more
 arguments enclosed by parentheses. All available functions are listed on the
-page [Functions](https://github.com/josdejong/mathjs/blob/master/docs/functions.md).
+page [Functions](functions.md).
 
 ```js
 math.eval('sqrt(25)');          // 5
@@ -283,11 +298,11 @@ only be defined on a single line.
 ```js
 var parser = math.parser();
 
-parser.eval('function f(x) = x ^ 2 - 5');
+parser.eval('f(x) = x ^ 2 - 5');
 parser.eval('f(2)');    // -1
 parser.eval('f(3)');    // 4
 
-parser.eval('function g(x, y) = x ^ y');
+parser.eval('g(x, y) = x ^ y');
 parser.eval('g(2, 3)'); // 8
 ```
 
@@ -296,7 +311,7 @@ parser.eval('g(2, 3)'); // 8
 
 Math.js has a number of built in constants such as `pi` and `e`.
 All available constants are listed on he page
-[Constants](https://github.com/josdejong/mathjs/blob/master/docs/constants.md).
+[Constants](constants.md).
 
 ```js
 // use constants
@@ -353,7 +368,7 @@ math.eval('boolean("false")');  // false
 #### Numbers
 
 The most important and basic data type in math.js are numbers. Numbers use a
-point as decimal mark. Numbers can be entered with scientific notation.
+point as decimal mark. Numbers can be entered with exponential notation.
 Examples:
 
 ```js
@@ -375,7 +390,7 @@ math.eval('string(2.3)');     // "2.3"
 
 Math.js uses regular JavaScript numbers, which are floating points with a
 limited precision and limited range. The limitations are described in detail
-on the page [Numbers](https://github.com/josdejong/mathjs/blob/master/docs/numbers.md).
+on the page [Numbers](datatypes/numbers.md).
 
 ```js
 math.eval('1e-325');  // 0
@@ -403,7 +418,7 @@ math.format(ans, {precision: 14});  // "0.3"
 
 Math.js supports big numbers for calculations with an arbitrary precision.
 The pros and cons of Number and BigNumber are explained in detail on the page
-[Numbers](https://github.com/josdejong/mathjs/blob/master/docs/numbers.md).
+[Numbers](datatypes/numbers.md).
 
 BigNumbers are slower, but have a higher precision. Calculations with big
 numbers are supported only by arithmetic functions.
@@ -414,15 +429,13 @@ BigNumbers can be created using the `bignumber` function:
 math.eval('bignumber(0.1) + bignumber(0.2)'); // BigNumber, 0.3
 ```
 
-The default number type of the expression parser can be changed at instantation
+The default number type of the expression parser can be changed at instantiation
 of math.js. The expression parser can parser numbers as BigNumber by default:
 
 ```js
 var mathjs = require('mathjs'),
     math = mathjs({
-      number: {
-        defaultType: 'bignumber' // Choose from: 'number' (default) or 'bignumber'
-      }
+      number: 'bignumber' // Default type of number: 'number' (default) or 'bignumber'
     });
 
 // all numbers are parsed as BigNumber
@@ -478,16 +491,16 @@ parser.eval('number(a)');   // Error: 2 + i is no valid number
 math.js supports units. Units can be used in basic arithmetic operations like
 add and subtract, and units can be converted from one to another.
 An overview of all available units can be found on the page
-[Units](https://github.com/josdejong/mathjs/blob/master/docs/units.md).
+[Units](datatypes/units.md).
 
-Units can be converted using the operator `in`.
+Units can be converted using the operator `to` or `in`.
 
 ```js
 // create a unit
 math.eval('5.4 kg');                    // Unit, 5.4 kg
 
 // convert a unit
-math.eval('2 inch in cm');              // Unit, 5.08 cm
+math.eval('2 inch to cm');              // Unit, 5.08 cm
 math.eval('20 celsius in fahrenheit');  // Unit, ~68 fahrenheit
 
 // calculations with units
@@ -515,9 +528,9 @@ parser.eval('"hello"');                 // String, "hello"
 // string manipulation
 parser.eval('a = "hello" + " world"');  // String, "hello world"
 parser.eval('size(a)');                 // Number, 11
-parser.eval('a(1:5)');                  // String, "hello"
-parser.eval('a(1) = "H"');              // String, "Hello"
-parser.eval('a(7:12) = "there!"');      // String, "Hello there!"
+parser.eval('a[1:5]');                  // String, "hello"
+parser.eval('a[1] = "H"');              // String, "Hello"
+parser.eval('a[7:12] = "there!"');      // String, "Hello there!"
 
 // string conversion
 parser.eval('number("300")');           // Number, 300
@@ -569,7 +582,7 @@ math.eval('0:2:10');          // Matrix, [0, 2, 4, 6, 8, 10],       size [6]
 ```
 
 A subset can be retrieved from a matrix using indexes, and a subset of a matrix
-can be replaced by using indexes. Indexes are enclosed in parentheses, and
+can be replaced by using indexes. Indexes are enclosed in square brackets, and
 contain a number or a range for each of the matrix dimensions. A range can have
 its start and/or end undefined. When start is undefined, the range will start
 at 1, when end is undefined, the range will end at the end of the matrix.
@@ -589,16 +602,16 @@ parser.eval('b = zeros(2, 2)');       // Matrix, [[0, 0], [0, 0]]
 parser.eval('c = 5:9');               // Matrix, [5, 6, 7, 8, 9]
 
 // replace a subset in a matrix
-parser.eval('b(1, 1:2) = [5, 6]');    // Matrix, [[5, 6], [0, 0]]
-parser.eval('b(2, :) = [7, 8]');      // Matrix, [[5, 6], [7, 8]]
+parser.eval('b[1, 1:2] = [5, 6]');    // Matrix, [[5, 6], [0, 0]]
+parser.eval('b[2, :] = [7, 8]');      // Matrix, [[5, 6], [7, 8]]
 
 // perform a matrix calculation
 parser.eval('d = a * b');             // Matrix, [[19, 22], [43, 50]]
 
 // retrieve a subset of a matrix
-parser.eval('d(2, 1)');               // 43
-parser.eval('d(2, 1:end)');           // Matrix, [[43, 50]]
-parser.eval('c(end - 1 : -1 : 2)');   // Matrix, [8, 7, 6]
+parser.eval('d[2, 1]');               // 43
+parser.eval('d[2, 1:end]');           // Matrix, [[43, 50]]
+parser.eval('c[end - 1 : -1 : 2]');   // Matrix, [8, 7, 6]
 ```
 
 

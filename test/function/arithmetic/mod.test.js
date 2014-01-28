@@ -40,17 +40,26 @@ describe('mod', function() {
   });
 
   it('should calculate the modulus of bignumbers', function() {
-    assert.deepEqual(mod(bignumber(7), bignumber(2)).valueOf(), bignumber(1).valueOf());
+    assert.deepEqual(mod(bignumber(7), bignumber(2)), bignumber(1));
+    assert.deepEqual(mod(bignumber(7), bignumber(2)), bignumber(1));
     assert.deepEqual(mod(bignumber(8), bignumber(3)).valueOf(), bignumber(2).valueOf());
+  });
 
-    it.skip('should calculate the modulus of bignumbers for negative values', function () {
-      assert.deepEqual(mod(bignumber(-10), bignumber(4)).valueOf(), bignumber(2).valueOf());
-    });
+  it.skip('should calculate the modulus of bignumbers for fractions', function () {
+    assert.deepEqual(mod(bignumber(7).div(3), bignumber(1).div(3)), bignumber(0));
+  });
+
+  it.skip('should calculate the modulus of bignumbers for negative values', function () {
+    assert.deepEqual(mod(bignumber(-10), bignumber(4)), bignumber(2));
   });
 
   it('should calculate the modulus of mixed numbers and bignumbers', function() {
     assert.deepEqual(mod(bignumber(7), 2), bignumber(1));
     assert.deepEqual(mod(8, bignumber(3)), bignumber(2));
+
+    approx.equal(mod(7/3, bignumber(2)), 1/3);
+    approx.equal(mod(7/3, 1/3), 0);
+    approx.equal(mod(bignumber(7).div(3), 1/3), 0);
   });
 
   it('should calculate the modulus of mixed booleans and bignumbers', function() {
@@ -61,6 +70,7 @@ describe('mod', function() {
   it('should throw an error if used on complex numbers', function() {
     assert.throws(function () {mod(math.complex(1,2), 3)}, TypeError);
     assert.throws(function () {mod(3, math.complex(1,2))}, TypeError);
+    assert.throws(function () {mod(bignumber(3), math.complex(1,2))}, TypeError);
   });
 
   it('should an throw an error if used on a string', function() {

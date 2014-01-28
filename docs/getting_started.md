@@ -21,6 +21,11 @@ Note: when installed globally (using the `-g` option), math.js is available as
 a command line application `mathjs`, see section
 [command line interface](https://github.com/josdejong/mathjs/blob/master/docs/command_line_interface.md).
 
+### component(1)
+The library can be installed using [component(1)](https://github.com/component/component/):
+
+    component install josdejong/mathjs
+
 ### bower
 Or using [bower](http://twitter.github.io/bower/):
 
@@ -34,8 +39,9 @@ Or by downloading the latest version from
 ## Load
 
 Math.js can be used in node.js and in the browser. The library must be loaded
-and instantiated. When creating an instance, one can optionally provide options
-as described in [Options](https://github.com/josdejong/mathjs/blob/master/docs/options.md).
+and instantiated. When creating an instance, one can optionally provide
+configuration settings as described in
+[Configuration](https://github.com/josdejong/mathjs/blob/master/docs/configuration.md).
 
 ### Node.js
 
@@ -71,6 +77,11 @@ Math.js can be loaded as a regular javascript file in the browser:
 </body>
 </html>
 ```
+
+If support for old browsers (Internet Explorer 8 and older) is required,
+the [es5-shim](https://github.com/kriskowal/es5-shim) library must be loaded
+as well.
+
 
 ### Require.js
 
@@ -113,7 +124,7 @@ math.pow([[-1, 2], [3, 1]], 2);   // [[7, 0], [0, 7]]
 
 // expressions
 math.eval('12 / (2.3 + 0.7)');    // 4
-math.eval('5.08 cm in inch');     // 2 inch
+math.eval('5.08 cm to inch');     // 2 inch
 math.eval('sin(45 deg) ^ 2');     // 0.5
 math.eval('9 / 3 + 2i');          // 3 + 2i
 math.eval('det([-1, 2; 3, 1])');  // -7

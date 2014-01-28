@@ -44,6 +44,9 @@ describe('unequal', function() {
   it('should compare mixed numbers and bignumbers', function() {
     assert.deepEqual(unequal(bignumber(2), 3), true);
     assert.deepEqual(unequal(2, bignumber(2)), false);
+
+    assert.equal(unequal(1/3, bignumber(1).div(3)), false);
+    assert.equal(unequal(bignumber(1).div(3), 1/3), false);
   });
 
   it('should compare mixed booleans and bignumbers', function() {
@@ -64,6 +67,13 @@ describe('unequal', function() {
     assert.equal(unequal(complex(2,0), 3), true);
   });
 
+  it('should compare mixed complex numbers and bignumbers (downgrades to numbers)', function() {
+    assert.deepEqual(unequal(math.complex(6, 0), bignumber(6)), false);
+    assert.deepEqual(unequal(math.complex(6, -2), bignumber(6)), true);
+    assert.deepEqual(unequal(bignumber(6), math.complex(6, 0)), false);
+    assert.deepEqual(unequal(bignumber(6), math.complex(6, 4)), true);
+  });
+
   it('should compare two quantitites of the same unit correctly', function() {
     assert.equal(unequal(unit('100cm'), unit('10inch')), true);
     assert.equal(unequal(unit('100cm'), unit('1m')), false);
@@ -71,8 +81,14 @@ describe('unequal', function() {
     //assert.equal(unequal(unit('2.54cm'), unit('1inch')), false); // round-off error :(
   });
 
-  it('should throw an error when compating two different units', function() {
+  it('should throw an error when comparing numbers and units', function() {
     assert.throws(function () {unequal(unit('100cm'), 22)});
+    assert.throws(function () {unequal(22, unit('100cm'))});
+  });
+
+  it('should throw an error when comparing bignumbers and units', function() {
+    assert.throws(function () {unequal(unit('100cm'), bignumber(22))});
+    assert.throws(function () {unequal(bignumber(22), unit('100cm'))});
   });
 
   it('should compare two strings correctly', function() {

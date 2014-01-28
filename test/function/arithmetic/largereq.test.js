@@ -35,22 +35,25 @@ describe('largereq', function() {
   });
 
   it('should compare bignumbers', function() {
-    assert.deepEqual(largereq(bignumber(2), bignumber(3)), false);
-    assert.deepEqual(largereq(bignumber(2), bignumber(2)), true);
-    assert.deepEqual(largereq(bignumber(3), bignumber(2)), true);
-    assert.deepEqual(largereq(bignumber(0), bignumber(0)), true);
-    assert.deepEqual(largereq(bignumber(-2), bignumber(2)), false);
+    assert.equal(largereq(bignumber(2), bignumber(3)), false);
+    assert.equal(largereq(bignumber(2), bignumber(2)), true);
+    assert.equal(largereq(bignumber(3), bignumber(2)), true);
+    assert.equal(largereq(bignumber(0), bignumber(0)), true);
+    assert.equal(largereq(bignumber(-2), bignumber(2)), false);
   });
 
   it('should compare mixed numbers and bignumbers', function() {
-    assert.deepEqual(largereq(bignumber(2), 3), false);
-    assert.deepEqual(largereq(2, bignumber(2)), true);
+    assert.equal(largereq(bignumber(2), 3), false);
+    assert.equal(largereq(2, bignumber(2)), true);
+
+    assert.equal(largereq(1/3, bignumber(1).div(3)), true);
+    assert.equal(largereq(bignumber(1).div(3), 1/3), true);
   });
 
   it('should compare mixed booleans and bignumbers', function() {
-    assert.deepEqual(largereq(bignumber(0.1), true), false);
-    assert.deepEqual(largereq(bignumber(1), true), true);
-    assert.deepEqual(largereq(false, bignumber(0)), true);
+    assert.equal(largereq(bignumber(0.1), true), false);
+    assert.equal(largereq(bignumber(1), true), true);
+    assert.equal(largereq(false, bignumber(0)), true);
   });
 
   it('should compare two units correctly', function() {
@@ -62,6 +65,10 @@ describe('largereq', function() {
 
   it('should throw an error if comparing a unit with a number', function() {
     assert.throws(function () {largereq(unit('100cm'), 22)});
+  });
+
+  it('should throw an error if comparing a unit with a bignumber', function() {
+    assert.throws(function () {largereq(unit('100cm'), bignumber(22))});
   });
 
   it('should perform lexical comparison for 2 strings', function() {
@@ -80,6 +87,8 @@ describe('largereq', function() {
     assert.throws(function () {largereq(complex(1,1), complex(1,2))}, TypeError);
     assert.throws(function () {largereq(complex(2,1), 3)}, TypeError);
     assert.throws(function () {largereq(3, complex(2,4))}, TypeError);
+    assert.throws(function () {largereq(math.bignumber(3), complex(2,4))}, TypeError);
+    assert.throws(function () {largereq(complex(2,4), math.bignumber(3))}, TypeError);
   });
 
   it('should throw an error if comparing two matrices of different sizes', function() {

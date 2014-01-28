@@ -33,7 +33,7 @@ console.log('1. USING FUNCTION MATH.EVAL');
 console.log('\nevaluate expressions');
 print(math.eval('sqrt(3^2 + 4^2)'));        // 5
 print(math.eval('sqrt(-4)'));               // 2i
-print(math.eval('2 inch in cm'));           // 5.08 cm
+print(math.eval('2 inch to cm'));           // 5.08 cm
 print(math.eval('cos(45 deg)'));            // 0.70711
 
 // evaluate multiple expressions at once
@@ -65,7 +65,7 @@ scope.hello = function (name) {
 print(math.eval('hello("hero")', scope));   // "hello, hero!"
 
 // define a function as an expression
-var f = math.eval('function f(x) = x ^ a', scope);
+var f = math.eval('f(x) = x ^ a', scope);
 print(f(2));                                // 8
 print(scope.f(2));                          // 8
 
@@ -88,22 +88,26 @@ console.log('\nparse an expression into a node tree');
 var node1 = math.parse('sqrt(3^2 + 4^2)');
 print(node1.toString());                    // "ans = sqrt((3 ^ 2) + (4 ^ 2))"
 
-// evaluate a node
-print(node1.eval());                        // 5
+// compile the node
+var code1 = node1.compile(math);
+
+// evaluate the compiled code
+print(code1.eval());                        // 5
 
 // provide a scope
 console.log('\nprovide a scope');
+var node2 = math.parse('x^a');
+var code2 = node2.compile(math);
+print(node2.toString());                    // "ans = x ^ a"
 var scope = {
   x: 3,
   a: 2
 };
-var node2 = math.parse('x^a', scope);
-print(node2.toString());                    // "ans = x ^ a"
-print(node2.eval());                        // 9
+print(code2.eval(scope));                   // 9
 
 // change a value in the scope and re-evaluate the node
 scope.a = 3;
-print(node2.eval());                        // 27
+print(code2.eval(scope));                   // 27
 
 
 
@@ -120,14 +124,14 @@ var parser = math.parser();
 console.log('\nevaluate expressions');
 print(parser.eval('sqrt(3^2 + 4^2)'));          // 5
 print(parser.eval('sqrt(-4)'));                 // 2i
-print(parser.eval('2 inch in cm'));             // 5.08 cm
+print(parser.eval('2 inch to cm'));             // 5.08 cm
 print(parser.eval('cos(45 deg)'));              // 0.70711
 
 // define variables and functions
 console.log('\ndefine variables and functions');
 print(parser.eval('x = 7 / 2'));                // 3.5
 print(parser.eval('x + 3'));                    // 6.5
-print(parser.eval('function f(x, y) = x^y'));   // f(x, y)
+print(parser.eval('f(x, y) = x^y'));            // f(x, y)
 print(parser.eval('f(2, 3)'));                  // 8
 
 // manipulate matrices
@@ -137,18 +141,18 @@ print(parser.eval('f(2, 3)'));                  // 8
 console.log('\nmanipulate matrices');
 print(parser.eval('k = [1, 2; 3, 4]'));         // [[1, 2], [3, 4]]
 print(parser.eval('l = zeros(2, 2)'));          // [[0, 0], [0, 0]]
-print(parser.eval('l(1, 1:2) = [5, 6]'));       // [[5, 6], [0, 0]]
-print(parser.eval('l(2, :) = [7, 8]'));         // [[5, 6], [7, 8]]
+print(parser.eval('l[1, 1:2] = [5, 6]'));       // [[5, 6], [0, 0]]
+print(parser.eval('l[2, :] = [7, 8]'));         // [[5, 6], [7, 8]]
 print(parser.eval('m = k * l'));                // [[19, 22], [43, 50]]
-print(parser.eval('n = m(2, 1)'));              // 43
-print(parser.eval('n = m(:, 1)'));              // [[19], [43]]
+print(parser.eval('n = m[2, 1]'));              // 43
+print(parser.eval('n = m[:, 1]'));              // [[19], [43]]
 
 // get and set variables and functions
 console.log('\nget and set variables and function in the scope of the parser');
 var x = parser.get('x');
 console.log('x =', x);                          // x = 7
 var f = parser.get('f');
-console.log('f =', f);                          // f = f(x, y)
+console.log('f =', math.format(f));             // f = f(x, y)
 var g = f(3, 3);
 console.log('g =', g);                          // g = 27
 

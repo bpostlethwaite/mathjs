@@ -71,6 +71,7 @@ math.add('hello ', 'world!');     // String  'hello world!'
 - math.matrix(x)
 - math.number(x)
 - math.parser()
+- math.select([x])
 - math.string(x)
 - math.unit(x)
 
@@ -98,11 +99,13 @@ math.add('hello ', 'world!');     // String  'hello world!'
 
 ## Probability
 
-- math.factorial(x)
+- math.combinations(n, k)
+- math.factorial(n)
+- math.distribution(name)
+- math.permutations(n [, k])
+- math.pickRandom(array)
 - math.random([min, max])
 - math.randomInt([min, max])
-- math.pickRandom(array)
-- math.distribution(name)
 
 ## Statistics
 
@@ -125,15 +128,15 @@ math.add('hello ', 'world!');     // String  'hello world!'
 
 ## Units
 
-- math.in(x, unit)
+- math.to(x, unit)
 
 ## Utils
 
+- math.config(settings)
 - math.clone(x)
 - math.forEach(x, callback)
 - math.format(value [, precision])
 - math.import(filename | object, override)
 - math.map(x, callback)
 - math.print(template, values [, precision])
-- math.select([x])
 - math.typeof(x)

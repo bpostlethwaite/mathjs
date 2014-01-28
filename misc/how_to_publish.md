@@ -65,13 +65,22 @@ Publish to jam.js:
     jam publish
 
 No need to publish for bower: The library is already published because of the
-new version tag.
+new version tag. There is also no need to publish a component(1) build, because
+component(1) uses GitHub as it's registry.
 
-Pubish at http://jspkg.com: go to the website, select the github project,
+Publish at http://jspkg.com: go to the website, select the github project,
 select the new version and press the button.
 
-Publish at cdnjs: add the new version of the library, then do a pull request
-with as title "[author] Update mathjs to 1.2.4" (with correct version)
+Publish at cdnjs:
+
+- clone the cdnjs project
+- pull changes: `git pull upstream`
+- add the new version of the library under /ajax/libs/mathjs/
+  - add new folder /x.y.z/ with the new library
+  - update the version number in package.json
+- test the library by running `npm test`
+- then do a pull request with as title "[author] Update mathjs to x.y.z"
+  (with correct version).
 
 
 ## Test published libraries

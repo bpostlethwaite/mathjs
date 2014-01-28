@@ -33,22 +33,25 @@ describe('larger', function() {
   });
 
   it('should compare bignumbers', function() {
-    assert.deepEqual(larger(bignumber(2), bignumber(3)), false);
-    assert.deepEqual(larger(bignumber(2), bignumber(2)), false);
-    assert.deepEqual(larger(bignumber(3), bignumber(2)), true);
-    assert.deepEqual(larger(bignumber(0), bignumber(0)), false);
-    assert.deepEqual(larger(bignumber(-2), bignumber(2)), false);
+    assert.equal(larger(bignumber(2), bignumber(3)), false);
+    assert.equal(larger(bignumber(2), bignumber(2)), false);
+    assert.equal(larger(bignumber(3), bignumber(2)), true);
+    assert.equal(larger(bignumber(0), bignumber(0)), false);
+    assert.equal(larger(bignumber(-2), bignumber(2)), false);
   });
 
   it('should compare mixed numbers and bignumbers', function() {
-    assert.deepEqual(larger(bignumber(2), 3), false);
-    assert.deepEqual(larger(2, bignumber(2)), false);
+    assert.equal(larger(bignumber(2), 3), false);
+    assert.equal(larger(2, bignumber(2)), false);
+
+    assert.equal(larger(1/3, bignumber(1).div(3)), false);
+    assert.equal(larger(bignumber(1).div(3), 1/3), false);
   });
 
   it('should compare mixed booleans and bignumbers', function() {
-    assert.deepEqual(larger(bignumber(0.1), true), false);
-    assert.deepEqual(larger(bignumber(1), true), false);
-    assert.deepEqual(larger(false, bignumber(0)), false);
+    assert.equal(larger(bignumber(0.1), true), false);
+    assert.equal(larger(bignumber(1), true), false);
+    assert.equal(larger(false, bignumber(0)), false);
   });
 
   it('should add two measures of the same unit', function() {
@@ -60,6 +63,10 @@ describe('larger', function() {
 
   it('should throw an error if comparing a unit with a number', function() {
     assert.throws(function () {larger(unit('100cm'), 22)});
+  });
+
+  it('should throw an error if comparing a unit with a bignumber', function() {
+    assert.throws(function () {larger(unit('100cm'), bignumber(22))});
   });
 
   it('should perform lexical comparison for two strings', function() {
@@ -79,6 +86,8 @@ describe('larger', function() {
     assert.throws(function () {larger(complex(1,1), complex(1,2))}, TypeError);
     assert.throws(function () {larger(complex(2,1), 3)}, TypeError);
     assert.throws(function () {larger(3, complex(2,4))}, TypeError);
+    assert.throws(function () {larger(math.bignumber(3), complex(2,4))}, TypeError);
+    assert.throws(function () {larger(complex(2,4), math.bignumber(3))}, TypeError);
   });
 
   it('should throw an error if matrices are different sizes', function() {

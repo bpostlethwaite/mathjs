@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 var object = require('./lib/util/object');
 
 /**
@@ -247,3 +248,6 @@ for (var prop in instance) {
 if (typeof window !== 'undefined') {
   window.math = mathjs;
 }
+=======
+module.exports = require('./lib/math.js');
+>>>>>>> master

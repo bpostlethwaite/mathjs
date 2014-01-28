@@ -2,9 +2,49 @@
 https://github.com/josdejong/mathjs
 
 
-## not yet released, version 0.16.0
+## 2014-01-18, version 0.18.0
+
+- Changed matrix index notation of expression parser from round brackets to
+  square brackets, for example `A[1, 1:3]` instead of `A(1, 1:3)`.
+- Removed need to use the `function` keyword for function assignments in the
+  expression parser, you can define a function now like `f(x) = x^2`.
+- Implemented a compilation step in the expression parser: expressions are
+  compiled into JavaScript, giving much better performance (easily 10x as fast).
+- Renamed unit conversion function and operator `in` to `to`. Operator `in` is
+  still available in the expression parser as an alias for `to`. Added unit
+  `in`, an abbreviation for `inch`. Thanks Elijah Insua (tmpvar).
+- Added plurals and aliases for units.
+- Implemented an argument `includeEnd` for function `range` (false by default).
+- Ranges in the expression parser now support big numbers.
+- Implemented functions `permutations` and `combinations`.
+  Thanks Daniel Levin (daniel-levin).
+- Added lower case abbreviation `l` for unit litre.
+
+
+## 2013-12-19, version 0.17.1
+
+- Fixed a bug with negative temperatures.
+- Fixed a bug with prefixes of units squared meter `m2` and cubic meter `m3`.
+
+
+## 2013-12-12, version 0.17.0
+
+- Renamed and flattened configuration settings:
+  - `number.defaultType` is now `number`.
+  - `number.precision` is now `decimals`.
+  - `matrix.defaultType` is now `matrix`.
+- Function `multiply` now consistently outputs a complex number on complex input.
+- Fixed `mod` and `in` not working as function (only as operator).
+- Fixed support for old browsers (IE8 and older), compatible when using es5-shim.
+- Fixed support for Java's ScriptEngine.
+
+
+## 2013-11-28, version 0.16.0
 
 - Implemented BigNumber support for arbitrary precision calculations.
+  Added settings `number.defaultType` and `number.precision` to configure
+  big numbers.
+- Documentation is extended.
 - Removed utility functions `isScalar`, `toScalar`, `isVector`, `toVector`
   from `Matrix` and `Range`. Use `math.squeeze` and `math.size` instead.
 - Implemented functions `get` and `set` on `Matrix`, for easier and faster
@@ -14,10 +54,14 @@ https://github.com/josdejong/mathjs
   number 1 or 0 when no arguments are provided.
 - Implemented functions `min` and `max` for `Range` and `Index`.
 - Resizing matrices now leaves new elements undefined by default instead of
-  filling them with zeros.
+  filling them with zeros. Function `resize` now has an extra optional
+  parameter `defaultValue`.
 - Range operator `:` in expression parser has been given a higher precedence.
 - Functions don't allow arguments of unknown type anymore.
-- Function `format` outputs scientific notation with positive exponents now
+- Options be set when constructing a math.js instance or using the new function
+  `config(options`. Options are no longer accessible via `math.options`.
+- Renamed `scientific` notation to `exponential` in function `format`.
+- Function `format` outputs exponential notation with positive exponents now
   always with `+` sign, so outputs `2.1e+3` instead of `2.1e3`.
 - Fixed function `squeeze` not being able squeeze into a scalar.
 - Some fixes and performance improvements in the `resize` and `subset`

@@ -1,5 +1,6 @@
 var assert = require('assert'),
-    math = require('../../../index')(),
+    mathjs = require('../../../index'),
+    math = mathjs(),
     range = math.range,
     matrix = math.matrix;
 
@@ -26,14 +27,54 @@ describe('range', function() {
     assert.deepEqual(range(2,-4,-2), matrix([2,0,-2]));
   });
 
-  it('should output an array when math.options.matrix.defaultType==="array"', function() {
-    var old = math.options.matrix.defaultType;
-    math.options.matrix.defaultType = 'array';
+  it('should output an array when setting matrix==="array"', function() {
+    var math2 = mathjs({
+      matrix: 'array'
+    });
 
-    assert.deepEqual(range(0,10,2), [0,2,4,6,8]);
-    assert.deepEqual(range(5,0,-1), [5,4,3,2,1]);
+    assert.deepEqual(math2.range(0,10,2), [0,2,4,6,8]);
+    assert.deepEqual(math2.range(5,0,-1), [5,4,3,2,1]);
+  });
 
-    math.options.matrix.defaultType = old;
+  it('should create a range with bignumbers', function() {
+    assert.deepEqual(range(math.bignumber(1), math.bignumber(3)), matrix([math.bignumber(1),math.bignumber(2)]));
+  });
+
+  it('should create a range with mixed numbers and bignumbers', function() {
+    assert.deepEqual(range(math.bignumber(1), 3), matrix([math.bignumber(1),math.bignumber(2)]));
+    assert.deepEqual(range(1, math.bignumber(3)), matrix([math.bignumber(1),math.bignumber(2)]));
+
+    assert.deepEqual(range(1, math.bignumber(3), math.bignumber(1)), matrix([math.bignumber(1),math.bignumber(2)]));
+    assert.deepEqual(range(math.bignumber(1), 3, math.bignumber(1)), matrix([math.bignumber(1),math.bignumber(2)]));
+    assert.deepEqual(range(math.bignumber(1), math.bignumber(3), 1), matrix([math.bignumber(1),math.bignumber(2)]));
+
+    assert.deepEqual(range(math.bignumber(1), 3, 1), matrix([math.bignumber(1),math.bignumber(2)]));
+    assert.deepEqual(range(1, math.bignumber(3), 1), matrix([math.bignumber(1),math.bignumber(2)]));
+    assert.deepEqual(range(1, 3, math.bignumber(1)), matrix([math.bignumber(1),math.bignumber(2)]));
+  });
+
+  it('should parse a range with bignumbers', function() {
+    var math = mathjs({
+      number: 'bignumber'
+    });
+    assert.deepEqual(math.range('1:3'), matrix([math.bignumber(1),math.bignumber(2)]));
+  });
+
+  describe ('option includeEnd', function () {
+    it('should parse a string and include end', function () {
+      assert.deepEqual(range('1:6', false), matrix([1,2,3,4,5]));
+      assert.deepEqual(range('1:6', true), matrix([1,2,3,4,5,6]));
+    });
+
+    it('should create a range start:1:end and include end', function () {
+      assert.deepEqual(range(3,6, false), matrix([3,4,5]));
+      assert.deepEqual(range(3,6, true), matrix([3,4,5,6]));
+    });
+
+    it('should create a range start:step:end and include end', function () {
+      assert.deepEqual(range(0,10,2, false), matrix([0,2,4,6,8]));
+      assert.deepEqual(range(0,10,2, true), matrix([0,2,4,6,8,10]));
+    });
   });
 
   it('should throw an error if called with an invalid string', function() {

@@ -34,22 +34,25 @@ describe('equal', function() {
   });
 
   it('should compare bignumbers', function() {
-    assert.deepEqual(equal(bignumber(2), bignumber(3)), false);
-    assert.deepEqual(equal(bignumber(2), bignumber(2)), true);
-    assert.deepEqual(equal(bignumber(3), bignumber(2)), false);
-    assert.deepEqual(equal(bignumber(0), bignumber(0)), true);
-    assert.deepEqual(equal(bignumber(-2), bignumber(2)), false);
+    assert.equal(equal(bignumber(2), bignumber(3)), false);
+    assert.equal(equal(bignumber(2), bignumber(2)), true);
+    assert.equal(equal(bignumber(3), bignumber(2)), false);
+    assert.equal(equal(bignumber(0), bignumber(0)), true);
+    assert.equal(equal(bignumber(-2), bignumber(2)), false);
   });
 
   it('should compare mixed numbers and bignumbers', function() {
     assert.deepEqual(equal(bignumber(2), 3), false);
     assert.deepEqual(equal(2, bignumber(2)), true);
+
+    assert.equal(equal(1/3, bignumber(1).div(3)), true);
+    assert.equal(equal(bignumber(1).div(3), 1/3), true);
   });
 
   it('should compare mixed booleans and bignumbers', function() {
-    assert.deepEqual(equal(bignumber(0.1), true), false);
-    assert.deepEqual(equal(bignumber(1), true), true);
-    assert.deepEqual(equal(false, bignumber(0)), true);
+    assert.equal(equal(bignumber(0.1), true), false);
+    assert.equal(equal(bignumber(1), true), true);
+    assert.equal(equal(false, bignumber(0)), true);
   });
 
   it('should compare two complex numbers correctly', function() {
@@ -64,11 +67,22 @@ describe('equal', function() {
     assert.equal(equal(complex(2,0), 3), false);
   });
 
+  it('should compare mixed complex numbers and bignumbers (downgrades to numbers)', function() {
+    assert.deepEqual(equal(math.complex(6, 0), bignumber(6)), true);
+    assert.deepEqual(equal(math.complex(6, -2), bignumber(6)), false);
+    assert.deepEqual(equal(bignumber(6), math.complex(6, 0)), true);
+    assert.deepEqual(equal(bignumber(6), math.complex(6, 4)), false);
+  });
+
   it('should compare two units correctly', function() {
     assert.equal(equal(unit('100cm'), unit('10inch')), false);
     assert.equal(equal(unit('100cm'), unit('1m')), true);
     //assert.equal(equal(unit('12inch'), unit('1foot')), true); // round-off error :(
     //assert.equal(equal(unit('2.54cm'), unit('1inch')), true); // round-off error :(
+  });
+
+  it('should throw an error when comparing a unit with a big number', function() {
+    assert.throws( function () {equal(math.unit('5 m'), bignumber(10)).toString() });
   });
 
   it('should throw an error when comparing a unit with a number', function() {

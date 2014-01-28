@@ -9,12 +9,12 @@ var jake = require('jake'),
 /**
  * Constants
  */
-var INDEX       = './index.js';
-var HEADER      = './lib/header.js';
-var SHIM        = './lib/shim.js';
-var DIST        = './dist';
-var MATHJS      = DIST + '/math.js';
-var MATHJS_MIN  = DIST + '/math.min.js';
+var INDEX             = './index.js',
+    HEADER            = './lib/header.js',
+    DIST              = './dist',
+    MATHJS            = DIST + '/math.js',
+    MATHJS_MIN        = DIST + '/math.min.js',
+    MATHJS_MAP        = MATHJS_MIN + '.map';
 
 // register start time
 var start = +new Date();
@@ -48,8 +48,8 @@ task('bundle', {async: true}, function () {
       throw err;
     }
 
-    // add header and shim
-    var lib = util.read(HEADER) + code + util.read(SHIM);
+    // add header and shim to code
+    var lib = util.read(HEADER) + code;
 
     // write bundled file
     util.write(MATHJS, lib);
@@ -71,9 +71,14 @@ task('minify', ['bundle'], function () {
   var result = util.minify({
     src: MATHJS,
     dest: MATHJS_MIN,
+    options: {
+      outSourceMap: MATHJS_MAP // TODO: map doesn't work
+    },
     header: util.read(HEADER)
   });
   updateVersion(MATHJS_MIN);
+
+  // TODO: generate a file with map for debugging
 
   console.log('Minified library ' + MATHJS_MIN + ' (' + filesize(result.code.length, 1) + ')');
 });

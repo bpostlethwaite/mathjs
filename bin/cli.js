@@ -24,7 +24,7 @@
  *     cat script.txt | mathjs > results.txt  Run input stream, output to file
  *
  * @license
- * Copyright (C) 2013 Jos de Jong <wjosdejong@gmail.com>
+ * Copyright (C) 2013-2014 Jos de Jong <wjosdejong@gmail.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy
@@ -39,9 +39,12 @@
  * the License.
  */
 
-var math = require('../index')(),
+var mathjs = require('../index'),
+    math = mathjs(),
     parser = math.parser(),
     fs = require('fs');
+
+var PRECISION = 14; // digits
 
 /**
  * auto complete a text
@@ -166,9 +169,8 @@ function runStream (input, output) {
           var res = parser.eval(expr);
           if (!Array.isArray(res) || res.length) {
             // TODO: how to distinguish array output from multi-line output?
-            console.log(math.format(res, {
-              precision: 5
-            }));
+
+            console.log(math.format(res, PRECISION));
           }
         }
         catch (err) {

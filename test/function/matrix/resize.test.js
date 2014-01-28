@@ -23,6 +23,16 @@ describe('resize', function() {
     assert.deepEqual(math.resize(array, [3]), [0,1,2]);
   });
 
+  it('should resize an array with bignumbers', function() {
+    var zero = math.bignumber(0);
+    var one = math.bignumber(1);
+    var two = math.bignumber(2);
+    var three = math.bignumber(3);
+    var array = [one, two, three];
+    assert.deepEqual(math.resize(array, [three, two], zero),
+        [[one,two], [zero, zero], [zero, zero]]);
+  });
+
   it('should resize a matrix', function() {
     var matrix = new Matrix([[0,1,2],[3,4,5]]);
     assert.deepEqual(math.resize(matrix, [3, 2]),
@@ -48,11 +58,9 @@ describe('resize', function() {
     assert.deepEqual(math.resize(matrix, []), 0);
   });
 
-  it('should resize a scalar into an array when array is specified in options', function() {
+  it('should resize a scalar into an array when array is specified in settings', function() {
     var math = require('../../../index')({
-      matrix: {
-        defaultType: 'array'
-      }
+      matrix: 'array'
     });
 
     assert.deepEqual(math.resize(2, [3], 4), [2, 4, 4]);

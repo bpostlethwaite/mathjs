@@ -41,6 +41,9 @@ describe('divide', function() {
     assert.deepEqual(divide(bignumber(0.3), 0.2), bignumber(1.5));
     assert.deepEqual(divide(0.3, bignumber(0.2)), bignumber(1.5));
     assert.deepEqual(divide(bignumber('2.6e5000'), 2), bignumber('1.3e5000'));
+
+    approx.equal(divide(1/3, bignumber(2)), 0.166666666666667);
+    approx.equal(divide(bignumber(1), 1/3), 3);
   });
 
   it('should divide mixed booleans and bignumbers', function() {
@@ -81,8 +84,22 @@ describe('divide', function() {
     approx.deepEqual(divide(complex(-2, -3), complex(-4, -5)), complex('0.5609756097560976 + 0.0487804878048781i'));
   });
 
+  it('should divide mixed complex numbers and numbers', function() {
+    assert.deepEqual(divide(math.complex(6, -4), 2), math.complex(3, -2));
+    assert.deepEqual(divide(1, math.complex(2, 4)), math.complex(0.1, -0.2));
+  });
+
+  it('should divide mixed complex numbers and bignumbers', function() {
+    assert.deepEqual(divide(math.complex(6, -4), bignumber(2)), math.complex(3, -2));
+    assert.deepEqual(divide(bignumber(1), math.complex(2, 4)), math.complex(0.1, -0.2));
+  });
+
   it('should divide units by a number', function() {
     assert.equal(divide(math.unit('5 m'), 10).toString(), '500 mm');
+  });
+
+  it('should divide units by a big number', function() {
+    assert.equal(divide(math.unit('5 m'), bignumber(10)).toString(), '500 mm');
   });
 
   it('should divide each elements in a matrix by a number', function() {

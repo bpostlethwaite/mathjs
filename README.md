@@ -48,7 +48,7 @@ math.pow([[-1, 2], [3, 1]], 2);   // [[7, 0], [0, 7]]
 
 // expressions
 math.eval('12 / (2.3 + 0.7)');    // 4
-math.eval('5.08 cm in inch');     // 2 inch
+math.eval('5.08 cm to inch');     // 2 inch
 math.eval('sin(45 deg) ^ 2');     // 0.5
 math.eval('9 / 3 + 2i');          // 3 + 2i
 math.eval('det([-1, 2; 3, 1])');  // -7
@@ -76,18 +76,13 @@ First clone the project from github:
     git clone git://github.com/josdejong/mathjs.git
     cd mathjs
 
-The project uses [jake](https://github.com/mde/jake) as build tool.
-To be able to run jake from the command line, jake must be installed globally:
-
-    sudo npm install -g jake
-
 Install the project dependencies:
 
     npm install
 
-Then, the project can be build by executing jake in the root of the project:
+Then, the project can be build by executing the build script via npm:
 
-    jake
+    npm run build
 
 This will build the library math.js and math.min.js from the source files and
 put them in the folder dist.
@@ -103,10 +98,20 @@ Then, the tests can be executed:
 
     npm test
 
+To test code coverage of the tests:
+
+    npm run coverage
+
+To see the coverage results, open the generated report in your browser:
+
+    ./coverage/lcov-report/index.html
+
+
+
 
 ## License
 
-Copyright (C) 2013 Jos de Jong <wjosdejong@gmail.com>
+Copyright (C) 2013-2014 Jos de Jong <wjosdejong@gmail.com>
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

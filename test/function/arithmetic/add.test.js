@@ -37,11 +37,19 @@ describe('add', function() {
   it('should add mixed numbers and bignumbers', function() {
     assert.deepEqual(add(bignumber(0.1), 0.2), bignumber(0.3));
     assert.deepEqual(add(0.1, bignumber(0.2)), bignumber(0.3));
+
+    approx.equal(add(1/3, bignumber(1)), 1.333333333333333);
+    approx.equal(add(bignumber(1), 1/3), 1.333333333333333);
   });
 
   it('should add mixed booleans and bignumbers', function() {
     assert.deepEqual(add(bignumber(0.1), true), bignumber(1.1));
     assert.deepEqual(add(false, bignumber(0.2)), bignumber(0.2));
+  });
+
+  it('should add mixed complex numbers and bignumbers', function() {
+    assert.deepEqual(add(math.complex(3, -4), bignumber(2)), math.complex(5, -4));
+    assert.deepEqual(add(bignumber(2), math.complex(3, -4)), math.complex(5, -4));
   });
 
   it('should add two complex numbers', function() {
@@ -77,6 +85,16 @@ describe('add', function() {
     assert.ok(a5 instanceof math.type.Matrix);
     assert.deepEqual(a5.size(), [2,2]);
     assert.deepEqual(a5.valueOf(), [[7,10],[15,22]]);
+  });
+
+  it('should add a scalar and a matrix correctly', function() {
+    assert.deepEqual(add(2, math.matrix([3,4])), math.matrix([5,6]));
+    assert.deepEqual(add(math.matrix([3,4]), 2), math.matrix([5,6]));
+  });
+
+  it('should add a scalar and an array correctly', function() {
+    assert.deepEqual(add(2, [3,4]), [5,6]);
+    assert.deepEqual(add([3,4], 2), [5,6]);
   });
 
   it('should add a matrix and an array correctly', function() {
