@@ -7,7 +7,7 @@
  * mathematical functions, and a flexible expression parser.
  *
  * @version 0.18.1
- * @date    2014-03-11
+ * @date    2014-03-12
  *
  * @license
  * Copyright (C) 2013-2014 Jos de Jong <wjosdejong@gmail.com>
@@ -5185,17 +5185,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	   * @return {*} res
 	   * @throws {Error}
 	   */
-	  math.prettyprint = function (expr, scope) {
-	    if (arguments.length != 1 && arguments.length != 2) {
-	      throw new util.error.ArgumentsError('prettyprint', arguments.length, 1, 2);
-	    }
+	  math.prettyprint = function (expr, scope, precision) {
+	    // if (arguments.length != 1 && arguments.length != 2) {
+	    //   throw new util.error.ArgumentsError('prettyprint', arguments.length, 1, 2);
+	    // }
 
 	    if (!scope) scope = {};
 
 	    if (isString(expr)) {
 	      // prettyprint a single expression
 	      var node = math.parse(expr);
-	      enablePretty(node, scope)
+	      enablePretty(node, scope, precision)
 	      return node.expr.toString();
 	    }
 	    else if (isCollection(expr)) {
@@ -5325,17 +5325,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 
-	  function symbolNodetoString (scope) {
+	  function symbolNodetoString (scope, precision) {
+	    if (!precision) precision = 3;
 	    return function () {
 	      var value = scope[this.name]
 	      if (isNumber(value))
-	        return value.toString()
+	        return round(Number(value), precision).toString()
 	      else
 	        return this.name
 	    }
 	  }
 
-	  function enablePretty (node, scope) {
+	  function enablePretty (node, scope, precision) {
 	    /**
 	     * Over-ride Object.prototype.toString
 	     * method with an Object.toString method.
@@ -5354,7 +5355,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    })
 
 	    symbols.forEach( function (o) {
-	      o.toString = symbolNodetoString(scope)
+	      o.toString = symbolNodetoString(scope, precision)
 	    })
 
 
@@ -5393,6 +5394,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	      prec = precs[node.op]
 
 	    return prec
+	  }
+
+	  function round(number, decimals) {
+	    return parseFloat(number.toFixed(decimals));
 	  }
 
 	};
