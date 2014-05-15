@@ -1,6 +1,7 @@
 // test divide
 var assert = require('assert'),
     math = require('../../../index')(),
+    error = require('../../../lib/error/index'),
     approx = require('../../../tools/approx'),
     divide = math.divide,
     bignumber = math.bignumber,
@@ -47,8 +48,10 @@ describe('divide', function() {
   });
 
   it('should divide mixed booleans and bignumbers', function() {
-    assert.deepEqual(divide(bignumber(0.3), bignumber(true)), bignumber(0.3));
+    assert.deepEqual(divide(bignumber(0.3), true), bignumber(0.3));
+    assert.deepEqual(divide(bignumber(0.3), false), bignumber(Infinity));
     assert.deepEqual(divide(false, bignumber('2')), bignumber(0));
+    assert.deepEqual(divide(true, bignumber('2')), bignumber(0.5));
   });
 
   it('should divide two complex numbers', function() {
@@ -135,6 +138,10 @@ describe('divide', function() {
 
   it('should throw an error if dividing a number by a unit', function() {
     assert.throws(function () {divide(10, math.unit('5 m')).toString()});
+  });
+
+  it('should throw an error if dividing a unit by a non-number', function() {
+    assert.throws(function () {divide(math.unit('5 m'), math.unit('5cm')).toString()});
   });
 
   it('should throw an error if there\'s wrong number of arguments', function() {

@@ -1,4 +1,5 @@
 var assert = require('assert'),
+    error = require('../../../lib/error/index'),
     math = require('../../../index')(),
     bool = math['boolean'];
 
@@ -31,11 +32,24 @@ describe('boolean', function() {
   });
 
   it('should convert a string into a boolean', function() {
+    assert.equal(bool('true'), true);
+    assert.equal(bool('false'), false);
+
+    assert.equal(bool('True'), true);
+    assert.equal(bool('False'), false);
+
+    assert.equal(bool('1'), true);
+    assert.equal(bool('0'), false);
+    assert.equal(bool(' 0 '), false);
+
     assert.equal(bool('2'), true);
     assert.equal(bool(' 4e2 '), true);
     assert.equal(bool(' -4e2 '), true);
-    assert.equal(bool('0'), false);
-    assert.equal(bool(' 0 '), false);
+  });
+
+  it('should convert a Boolean into a boolean', function() {
+    assert.equal(bool(new Boolean(true)), true);
+    assert.equal(bool(new Boolean(false)), false);
   });
 
   it('should throw an error if the string is not a valid number', function() {
@@ -44,8 +58,8 @@ describe('boolean', function() {
   });
 
   it('should throw an error if there\'s a wrong number of arguments', function() {
-    assert.throws(function () {bool(1,2)}, math.error.ArgumentsError);
-    assert.throws(function () {bool(1,2,3)}, math.error.ArgumentsError);
+    assert.throws(function () {bool(1,2)}, error.ArgumentsError);
+    assert.throws(function () {bool(1,2,3)}, error.ArgumentsError);
   });
 
   it('should throw an error if used with a complex', function() {

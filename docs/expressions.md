@@ -74,13 +74,13 @@ into JavaScript code. This is a shortcut for first [parsing](#parse) and then
 compiling an expression. The syntax is:
 
 ```js
-math.compile(expr)
-math.compile([expr1, expr2, expr3, ...])
+math.compile(expr);
+math.compile([expr1, expr2, expr3, ...]);
 ```
 
 Function `compile` accepts a single expression or an array with
 expressions as argument. Function `compile` returns an object with a function
-`eval([scope])`, which can executed to evaluate the expression against an
+`eval([scope])`, which can be executed to evaluate the expression against an
 (optional) scope:
 
 ```js
@@ -173,22 +173,15 @@ var parser = math.parser();
 The parser contains the following functions:
 
 - `clear()`
-  Completely clear the parsers scope.
-- `compile(expr)`
-  Parse and compile an expression into javascript code.
-  Returns an Object with function `eval([scope])`, which when executed
-  returns the result of the expression.
+  Completely clear the parser's scope.
 - `eval(expr)`
-  Evaluate an expression. Returns the result of the expression.s
+  Evaluate an expression. Returns the result of the expression.
 - `get(name)`
-  Retrieve a variable or function from the parsers scope.
-- `parse(expr)`
-  Parse an expression into a node tree. Returns a `Node`, which can be
-  compiled and evaluated like `node.compile(math).eval([scope])`.
+  Retrieve a variable or function from the parser's scope.
 - `remove(name)`
-  Remove a variable or function from the parsers scope.
+  Remove a variable or function from the parser's scope.
 - `set(name, value)`
-  Set a variable or function in the parsers scope.
+  Set a variable or function in the parser's scope.
   A node can be evaluated as `node.eval()`.
 
 The following code shows how to create and use a parser.
@@ -268,35 +261,36 @@ math.eval('(2 + 3) * 4'); // 20
 
 The following operators are available:
 
-Operator    | Name                  | Syntax    | Associativity | Example               | Result
------------ | --------------------- | --------- | ------------- | --------------------- | ---------------
-`(`, `)`    | Parentheses           | `(x)`     | None          | `2 * (3 + 4)`         | `14`
-`[`, `]`    | Matrix, Index         | `[...]`   | None          | `[[1,2],[3,4]]`       | `[[1,2],[3,4]]`
-`,`         | Parameter separator   | `x, y`    | None          | `max(2, 1, 5)`        | `5`
-`;`         | Statement separator   | `x; y`    | Left to right | `a=2; b=3; a*b`       | `[6]`
-`;`         | Row separator         | `[x, y]`  | Left to right | `[1,2;3,4]`           | `[[1,2],[3,4]]`
-`\n`        | Statement separator   | `x \n y`  | Left to right | `a=2 \n b=3 \n a*b`   | `[2,3,6]`
-`+`         | Add                   | `x + y`   | Left to right | `4 + 5`               | `9`
-`-`         | Subtract              | `x - y`   | Left to right | `7 - 3`               | `4`
-`*`         | Multiply              | `x * y`   | Left to right | `2 * 3`               | `6`
-`.*`        | Element-wise multiply | `x .* y`  | Left to right | `[1,2,3] .* [1,2,3]`  | `[1,4,9]`
-`/`         | Divide                | `x / y`   | Left to right | `6 / 2`               | `3`
-`./`        | Element-wise divide   | `x ./ y`  | Left to right | `[9,6,4] ./ [3,2,2]`  | `[3,3,2]`
-`%`, `mod`  | Modulus               | `x % y`   | Left to right | `8 % 3`               | `2`
-`^`         | Power                 | `x ^ y`   | Right to left | `2 ^ 3`               | `8`
-`.^`        | Element-wise power    | `x .^ y`  | Right to left | `[2,3] .^ [3,3]`      | `[9,27]`
-`-`         | Unary                 | `-y`      | None          | `-4`                  | `-4`
-`'`         | Transpose             | `y'`      | None          | `[[1,2],[3,4]]'`      | `[[1,3],[2,4]]`
-`!`         | Factorial             | `y!`      | None          | `5!`                  | `120`
-`=`         | Assignment            | `x = y`   | Right to left | `a = 5`               | `5`
-`:`         | Range                 | `x : y`   | None          | `1:4`                 | `[1,2,3,4]`
-`to`, `in`  | Unit conversion       | `x to y`  | Left to right | `2 inch to cm`        | `5.08 cm`
-`==`        | Equal                 | `x == y`  | Left to right | `2 == 4 - 2`          | `true`
-`!=`        | Unequal               | `x != y`  | Left to right | `2 != 3`              | `true`
-`<`         | Smaller               | `x < y`   | Left to right | `2 < 3`               | `true`
-`>`         | Larger                | `x > y`   | Left to right | `2 > 3`               | `false`
-`<=`        | Smallereq             | `x <= y`  | Left to right | `4 <= 3`              | `false`
-`>=`        | Largereq              | `x >= y`  | Left to right | `2 + 4 >= 6`          | `true`
+Operator    | Name                    | Syntax      | Associativity | Example               | Result
+----------- | ----------------------- | ----------  | ------------- | --------------------- | ---------------
+`(`, `)`    | Parentheses             | `(x)`       | None          | `2 * (3 + 4)`         | `14`
+`[`, `]`    | Matrix, Index           | `[...]`     | None          | `[[1,2],[3,4]]`       | `[[1,2],[3,4]]`
+`,`         | Parameter separator     | `x, y`      | None          | `max(2, 1, 5)`        | `5`
+`;`         | Statement separator     | `x; y`      | Left to right | `a=2; b=3; a*b`       | `[6]`
+`;`         | Row separator           | `[x, y]`    | Left to right | `[1,2;3,4]`           | `[[1,2],[3,4]]`
+`\n`        | Statement separator     | `x \n y`    | Left to right | `a=2 \n b=3 \n a*b`   | `[2,3,6]`
+`+`         | Add                     | `x + y`     | Left to right | `4 + 5`               | `9`
+`-`         | Subtract                | `x - y`     | Left to right | `7 - 3`               | `4`
+`*`         | Multiply                | `x * y`     | Left to right | `2 * 3`               | `6`
+`.*`        | Element-wise multiply   | `x .* y`    | Left to right | `[1,2,3] .* [1,2,3]`  | `[1,4,9]`
+`/`         | Divide                  | `x / y`     | Left to right | `6 / 2`               | `3`
+`./`        | Element-wise divide     | `x ./ y`    | Left to right | `[9,6,4] ./ [3,2,2]`  | `[3,3,2]`
+`%`, `mod`  | Modulus                 | `x % y`     | Left to right | `8 % 3`               | `2`
+`^`         | Power                   | `x ^ y`     | Right to left | `2 ^ 3`               | `8`
+`.^`        | Element-wise power      | `x .^ y`    | Right to left | `[2,3] .^ [3,3]`      | `[9,27]`
+`-`         | Unary                   | `-y`        | None          | `-4`                  | `-4`
+`'`         | Transpose               | `y'`        | None          | `[[1,2],[3,4]]'`      | `[[1,3],[2,4]]`
+`!`         | Factorial               | `y!`        | None          | `5!`                  | `120`
+`=`         | Assignment              | `x = y`     | Right to left | `a = 5`               | `5`
+`?` `:`     | Conditional expression  | `x ? y : z` | Right to left | `15 > 100 ? 1 : -1`   | `-1`
+`:`         | Range                   | `x : y`     | None          | `1:4`                 | `[1,2,3,4]`
+`to`, `in`  | Unit conversion         | `x to y`    | Left to right | `2 inch to cm`        | `5.08 cm`
+`==`        | Equal                   | `x == y`    | Left to right | `2 == 4 - 2`          | `true`
+`!=`        | Unequal                 | `x != y`    | Left to right | `2 != 3`              | `true`
+`<`         | Smaller                 | `x < y`     | Left to right | `2 < 3`               | `true`
+`>`         | Larger                  | `x > y`     | Left to right | `2 > 3`               | `false`
+`<=`        | Smallereq               | `x <= y`    | Left to right | `4 <= 3`              | `false`
+`>=`        | Largereq                | `x >= y`    | Left to right | `2 + 4 >= 6`          | `true`
 
 The operators have the following precedence, from highest to lowest:
 
@@ -313,6 +307,7 @@ Operators                         | Description
 `:`                               | Range
 `==`, `!=`, `<`, `>`, `<=`, `>=`  | Comparison
 `to`, `in`                        | Unit conversion
+`?`, `:`                          | Conditional expression
 `=`                               | Assignment
 `,`                               | Parameter and column separator
 `;`                               | Row separator
@@ -454,9 +449,9 @@ math.format(ans, {precision: 14});  // "0.3"
 ```
 
 
-#### Big numbers
+#### BigNumbers
 
-Math.js supports big numbers for calculations with an arbitrary precision.
+Math.js supports BigNumbers for calculations with an arbitrary precision.
 The pros and cons of Number and BigNumber are explained in detail on the page
 [Numbers](datatypes/numbers.md).
 
@@ -470,7 +465,7 @@ math.eval('bignumber(0.1) + bignumber(0.2)'); // BigNumber, 0.3
 ```
 
 The default number type of the expression parser can be changed at instantiation
-of math.js. The expression parser can parser numbers as BigNumber by default:
+of math.js. The expression parser parses numbers as BigNumber by default:
 
 ```js
 var mathjs = require('mathjs'),
@@ -482,9 +477,9 @@ var mathjs = require('mathjs'),
 math.eval('0.1 + 0.2'); // BigNumber, 0.3
 ```
 
-Big numbers can be converted to numbers and vice versa using the functions
-`number` and `bignumber`. When converting a big number to a number, the high
-precision of the will be lost.When a BigNumber is too large to be represented
+BigNumbers can be converted to numbers and vice versa using the functions
+`number` and `bignumber`. When converting a BigNumber to a Number, the high
+precision of the BigNumber will be lost. When a BigNumber is too large to be represented
 as Number, it will be initialized as `Infinity`.
 
 

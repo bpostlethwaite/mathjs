@@ -1,4 +1,5 @@
 var assert = require('assert'),
+    error = require('../../../lib/error/index'),
     math = require('../../../index')(),
     approx = require('../../../tools/approx'),
     pi = math.pi,
@@ -64,6 +65,11 @@ describe('asin', function() {
       complex(1.57079632679490, -1.76274717403909)];
     approx.deepEqual(asin([1,2,3]), asin123);
     approx.deepEqual(asin(matrix([1,2,3])), matrix(asin123));
+  });
+
+  it('should throw an error in case of invalid number of arguments', function() {
+    assert.throws(function () {asin()}, error.ArgumentsError);
+    assert.throws(function () {asin(1, 2)}, error.ArgumentsError);
   });
 
 });

@@ -1,5 +1,6 @@
 // test resize
 var assert = require('assert'),
+    error = require('../../../lib/error/index'),
     math = require('../../../index')(),
     Matrix = math.type.Matrix;
 
@@ -92,10 +93,17 @@ describe('resize', function() {
     assert.throws(function () {math.resize([], 2)});
     assert.throws(function () {math.resize([], [], 4, 555)});
 
+    assert.throws(function () {math.resize([], ['no number'])}, /Invalid size/);
+    assert.throws(function () {math.resize([], [2.3])}, /Invalid size/);
+
     assert.throws(function () {math.resize('hello', [])});
     assert.throws(function () {math.resize('hello', [2,3])});
     assert.throws(function () {math.resize('hello', [8], 'charzzz')});
     assert.throws(function () {math.resize('hello', [8], 2)});
+
+
+    assert.throws(function () {math.resize('hello', ['no number'])}, /Invalid size/);
+    assert.throws(function () {math.resize('hello', [2.3])}, /Invalid size/);
   });
 });
 

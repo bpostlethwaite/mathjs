@@ -1,4 +1,5 @@
 var assert = require('assert'),
+    error = require('../../../lib/error/index'),
     math = require('../../../index')();
 
 describe('im', function() {
@@ -34,6 +35,11 @@ describe('im', function() {
   it('should return the imaginary part for each element in a matrix', function() {
     assert.deepEqual(math.im([2, math.complex('3-6i')]), [0, -6]);
     assert.deepEqual(math.im(math.matrix([2, math.complex('3-6i')])).valueOf(), [0, -6]);
+  });
+
+  it('should throw an error in case of invalid number of arguments', function() {
+    assert.throws(function () {math.im()}, error.ArgumentsError);
+    assert.throws(function () {math.im(1, 2)}, error.ArgumentsError);
   });
 
 });

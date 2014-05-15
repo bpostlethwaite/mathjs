@@ -2,6 +2,7 @@
 var assert = require('assert'),
     math = require('../../../index')(),
     approx = require('../../../tools/approx'),
+    error = require('../../../lib/error/index'),
     emultiply = math.emultiply,
     divide = math.divide,
     matrix = math.matrix,
@@ -82,6 +83,11 @@ describe('emultiply', function() {
     assert.throws(function () {emultiply(d, b)});
     assert.throws(function () {emultiply(d, c)});
     assert.throws(function () {emultiply(c, b)});
+  });
+
+  it('should throw an error in case of invalid number of arguments', function() {
+    assert.throws(function () {emultiply(1)}, error.ArgumentsError);
+    assert.throws(function () {emultiply(1, 2, 3)}, error.ArgumentsError);
   });
 
 });

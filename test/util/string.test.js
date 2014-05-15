@@ -1,6 +1,7 @@
 // test string utils
 var assert = require('assert'),
     approx = require('../../tools/approx'),
+    BigNumber = require('decimal.js'),
     string = require('../../lib/util/string');
 
 describe ('string', function () {
@@ -29,6 +30,13 @@ describe ('string', function () {
 
     it ('should format a number', function () {
       assert.equal(string.format(2.3), '2.3');
+    });
+
+    it ('should format a bignumber', function () {
+      var B = BigNumber.config({
+        precision: 20
+      });
+      assert.equal(string.format(new B(1).div(3)), '0.33333333333333333333');
     });
 
     it ('should format a number with configuration', function () {
@@ -70,6 +78,10 @@ describe ('string', function () {
 
     it ('should format unknown objects by converting them to string', function () {
       assert.equal(string.format({}), '[object Object]');
+    });
+
+    it ('should format unknown primitives by converting them to string', function () {
+      assert.equal(string.format(true), 'true');
     });
 
   });

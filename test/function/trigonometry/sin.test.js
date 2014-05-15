@@ -1,4 +1,5 @@
 var assert = require('assert'),
+    error = require('../../../lib/error/index'),
     math = require('../../../index')(),
     approx = require('../../../tools/approx'),
     pi = math.pi,
@@ -64,6 +65,11 @@ describe('sin', function() {
 
   it('should return the sin of each element of a matrix', function() {
     approx.deepEqual(sin(matrix([1,2,3])), matrix(sin123));
+  });
+
+  it('should throw an error in case of invalid number of arguments', function() {
+    assert.throws(function () {sin()}, error.ArgumentsError);
+    assert.throws(function () {sin(1, 2)}, error.ArgumentsError);
   });
 
 });

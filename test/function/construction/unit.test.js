@@ -1,11 +1,14 @@
 var assert = require('assert'),
+    error = require('../../../lib/error/index'),
     math = require('../../../index')(),
     unit = math.unit;
+    Unit = require('../../../lib/type/Unit');
 
 describe('unit', function() {
 
   it ('should construct a unit', function () {
-    // TODO: test construction of a unit
+    var u = unit('5 cm');
+    assert.deepEqual(u, new Unit(5, 'cm'));
   });
 
   it('should parse a valid string to a unit', function() {
@@ -59,10 +62,10 @@ describe('unit', function() {
   });
 
   it('should throw an error if called with no argument', function() {
-    assert.throws(function () {unit()}, math.error.ArgumentsError);
+    assert.throws(function () {unit()}, error.ArgumentsError);
   });
 
   it('should throw an error if called with an invalid number of arguments', function() {  
-    assert.throws(function () {unit(1,2,3)}, math.error.ArgumentsError);
+    assert.throws(function () {unit(1,2,3)}, error.ArgumentsError);
   });
 });

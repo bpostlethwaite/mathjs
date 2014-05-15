@@ -1,6 +1,7 @@
 // test ceil
 var assert = require('assert'),
     approx = require('../../../tools/approx'),
+    error = require('../../../lib/error/index'),
     math = require('../../../index')(),
     bignumber = math.bignumber,
     complex = math.complex,
@@ -30,16 +31,16 @@ describe('ceil', function() {
   });
 
   it('should return the ceil of a big number', function () {
-    approx.deepEqual(ceil(bignumber(0)), bignumber(0));
-    approx.deepEqual(ceil(bignumber(1)), bignumber(1));
-    approx.deepEqual(ceil(bignumber(1.3)), bignumber(2));
-    approx.deepEqual(ceil(bignumber(1.8)), bignumber(2));
-    approx.deepEqual(ceil(bignumber(2)), bignumber(2));
-    approx.deepEqual(ceil(bignumber(-1)), bignumber(-1));
-    approx.deepEqual(ceil(bignumber(-1.3)), bignumber(-1));
-    approx.deepEqual(ceil(bignumber(-1.8)), bignumber(-1));
-    approx.deepEqual(ceil(bignumber(-2)), bignumber(-2));
-    approx.deepEqual(ceil(bignumber(-2.1)), bignumber(-2));
+    assert.deepEqual(ceil(bignumber(0)), bignumber(0));
+    assert.deepEqual(ceil(bignumber(1)), bignumber(1));
+    assert.deepEqual(ceil(bignumber(1.3)), bignumber(2));
+    assert.deepEqual(ceil(bignumber(1.8)), bignumber(2));
+    assert.deepEqual(ceil(bignumber(2)), bignumber(2));
+    assert.deepEqual(ceil(bignumber(-1)), bignumber(-1));
+    assert.deepEqual(ceil(bignumber(-1.3)), bignumber(-1));
+    assert.deepEqual(ceil(bignumber(-1.8)), bignumber(-1));
+    assert.deepEqual(ceil(bignumber(-2)), bignumber(-2));
+    assert.deepEqual(ceil(bignumber(-2.1)), bignumber(-2));
   });
 
   it('should return the ceil of real and imag part of a complex', function() {
@@ -62,6 +63,11 @@ describe('ceil', function() {
   it('should ceil each element in a matrix, array or range', function() {
     approx.deepEqual(ceil([1.2, 3.4, 5.6, 7.8, 10.0]), [2, 4, 6, 8, 10]);
     approx.deepEqual(ceil(matrix([1.2, 3.4, 5.6, 7.8, 10.0])), matrix([2, 4, 6, 8, 10]));
+  });
+
+  it('should throw an error in case of invalid number of arguments', function() {
+    assert.throws(function () {ceil()}, error.ArgumentsError);
+    assert.throws(function () {ceil(1, 2)}, error.ArgumentsError);
   });
 
 });

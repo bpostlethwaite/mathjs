@@ -1,6 +1,7 @@
 // test floor
 var assert = require('assert'),
     approx = require('../../../tools/approx'),
+    error = require('../../../lib/error/index'),
     math = require('../../../index')(),
     bignumber = math.bignumber,
     complex = math.complex,
@@ -30,16 +31,16 @@ describe('floor', function() {
   });
 
   it('should floor big numbers correctly', function() {
-    approx.deepEqual(floor(bignumber(0)), bignumber(0));
-    approx.deepEqual(floor(bignumber(1)), bignumber(1));
-    approx.deepEqual(floor(bignumber(1.3)), bignumber(1));
-    approx.deepEqual(floor(bignumber(1.8)), bignumber(1));
-    approx.deepEqual(floor(bignumber(2)), bignumber(2));
-    approx.deepEqual(floor(bignumber(-1)), bignumber(-1));
-    approx.deepEqual(floor(bignumber(-1.3)), bignumber(-2));
-    approx.deepEqual(floor(bignumber(-1.8)), bignumber(-2));
-    approx.deepEqual(floor(bignumber(-2)), bignumber(-2));
-    approx.deepEqual(floor(bignumber(-2.1)), bignumber(-3));
+    assert.deepEqual(floor(bignumber(0)), bignumber(0));
+    assert.deepEqual(floor(bignumber(1)), bignumber(1));
+    assert.deepEqual(floor(bignumber(1.3)), bignumber(1));
+    assert.deepEqual(floor(bignumber(1.8)), bignumber(1));
+    assert.deepEqual(floor(bignumber(2)), bignumber(2));
+    assert.deepEqual(floor(bignumber(-1)), bignumber(-1));
+    assert.deepEqual(floor(bignumber(-1.3)), bignumber(-2));
+    assert.deepEqual(floor(bignumber(-1.8)), bignumber(-2));
+    assert.deepEqual(floor(bignumber(-2)), bignumber(-2));
+    assert.deepEqual(floor(bignumber(-2.1)), bignumber(-3));
   });
 
   it('should floor complex numbers correctly', function() {
@@ -60,6 +61,11 @@ describe('floor', function() {
   it('should floor all elements in a matrix', function() {
     approx.deepEqual(floor([1.2, 3.4, 5.6, 7.8, 10.0]), [1, 3, 5, 7, 10]);
     approx.deepEqual(floor(matrix([1.2, 3.4, 5.6, 7.8, 10.0])), matrix([1, 3, 5, 7, 10]));
+  });
+
+  it('should throw an error in case of invalid number of arguments', function() {
+    assert.throws(function () {floor()}, error.ArgumentsError);
+    assert.throws(function () {floor(1, 2)}, error.ArgumentsError);
   });
 
 });

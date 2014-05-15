@@ -26,6 +26,7 @@ math.add('hello ', 'world!');     // String  'hello world!'
 - math.abs(x)
 - math.add(x, y)
 - math.ceil(x)
+- math.compare(x, y)
 - math.cube(x)
 - math.divide(x, y)
 - math.edivide(x, y)
@@ -43,6 +44,7 @@ math.add('hello ', 'world!');     // String  'hello world!'
 - math.log10(x)
 - math.mod(x, y)
 - math.multiply(x, y)
+- math.norm(x [, p])
 - math.pow(x, y)
 - math.round(x [, n])
 - math.sign()
@@ -111,8 +113,13 @@ math.add('hello ', 'world!');     // String  'hello world!'
 ## Statistics
 
 - math.max(a, b, c, ...)
-- math.min(a, b, c, ...)
 - math.mean(a, b, c, ...)
+- math.median(a, b, c, ...)
+- math.min(a, b, c, ...)
+- math.prod(a, b, c, ...)
+- math.std(a, b, c, ...)
+- math.sum(a, b, c, ...)
+- math.var(a, b, c, ...)
 
 ## Trigonometry
 
@@ -121,11 +128,17 @@ math.add('hello ', 'world!');     // String  'hello world!'
 - math.atan(x)
 - math.atan2(y, x)
 - math.cos(x)
+- math.cosh(x)
 - math.cot(x)
+- math.coth(x)
 - math.csc(x)
+- math.csch(x)
 - math.sec(x)
+- math.sech(x)
 - math.sin(x)
+- math.sinh(x)
 - math.tan(x)
+- math.tanh(x)
 
 ## Units
 
@@ -133,10 +146,11 @@ math.add('hello ', 'world!');     // String  'hello world!'
 
 ## Utils
 
-- math.config(settings)
+- math.config(options)
 - math.clone(x)
 - math.forEach(x, callback)
 - math.format(value [, precision])
+- math.ifElse(condition, trueExpr, falseExpr)
 - math.import(filename | object, override)
 - math.map(x, callback)
 - math.print(template, values [, precision])

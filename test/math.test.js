@@ -1,4 +1,5 @@
 var assert = require('assert'),
+    approx = require('../tools/approx'),
     mathjs = require('../index');
 
 describe('factory', function() {
@@ -10,7 +11,8 @@ describe('factory', function() {
     assert.deepEqual(math.config(), {
       matrix: 'matrix',
       number: 'number',
-      decimals: 20
+      precision: 20,
+      epsilon: 1e-14
     });
   });
 
@@ -24,7 +26,8 @@ describe('factory', function() {
     assert.deepEqual(math.config(), {
       matrix: 'array',
       number: 'bignumber',
-      decimals: 20
+      precision: 20,
+      epsilon: 1e-14
     });
   });
 
@@ -50,23 +53,55 @@ describe('factory', function() {
     assert.deepEqual(config, {
       matrix: 'matrix',
       number: 'number',
-      decimals: 20
+      precision: 20,
+      epsilon: 1e-14
     });
 
     math.config({
       matrix: 'array',
       number: 'bignumber',
-      decimals: 32
+      precision: 32,
+      epsilon: 1e-7
     });
 
     assert.deepEqual(math.config(), {
       matrix: 'array',
       number: 'bignumber',
-      decimals: 32
+      precision: 32,
+      epsilon: 1e-7
     });
 
     // restore the original config
     math.config(config);
+  });
+
+  // TODO: test whether the namespace is correct: has functions like sin, constants like pi, objects like type and error.
+
+  it('should convert a number into a bignumber (when possible)', function() {
+    var BigNumber = math.type.BigNumber;
+
+    assert.deepEqual(BigNumber.convert(2.34), new BigNumber(2.34));
+    assert.deepEqual(BigNumber.convert(0), new BigNumber(0));
+    assert.deepEqual(BigNumber.convert(2.3e-3), new BigNumber(2.3e-3));
+    assert.deepEqual(BigNumber.convert(2.3e+3), new BigNumber(2.3e+3));
+
+    // The following values can't represented as bignumber
+    approx.equal(BigNumber.convert(Math.PI), Math.PI);
+    approx.equal(BigNumber.convert(1/3), 1/3);
+  });
+
+  // TODO: test whether two instances of mathjs do not influence each others (BigNumber) settings
+
+  it('should throw an error when ES5 is not supported', function() {
+    var create = Object.create;
+    Object.create = undefined; // fake missing Object.create function
+
+    assert.throws(function () {
+      var math = mathjs();
+    }, /ES5 not supported/);
+
+    // restore Object.create
+    Object.create = create;
   });
 
 });

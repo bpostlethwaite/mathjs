@@ -1,6 +1,8 @@
 // test equal
 var assert = require('assert'),
-    math = require('../../../index')(),
+    mathjs = require('../../../index'),
+    math = mathjs(),
+    error = require('../../../lib/error/index'),
     bignumber = math.bignumber,
     complex = math.complex,
     matrix = math.matrix,
@@ -14,6 +16,26 @@ describe('equal', function() {
     assert.equal(equal(2, 2), true);
     assert.equal(equal(0, 0), true);
     assert.equal(equal(-2, 2), false);
+  });
+
+  it('should compare two floating point numbers correctly', function() {
+    // NaN
+    assert.equal(equal(Number.NaN, Number.NaN), false);
+    // Infinity
+    assert.equal(equal(Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY), true);
+    assert.equal(equal(Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY), true);
+    assert.equal(equal(Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY), false);
+    assert.equal(equal(Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY), false);
+    assert.equal(equal(Number.POSITIVE_INFINITY, 2.0), false);
+    assert.equal(equal(2.0, Number.POSITIVE_INFINITY), false);
+    assert.equal(equal(Number.NEGATIVE_INFINITY, 2.0), false);
+    assert.equal(equal(2.0, Number.NEGATIVE_INFINITY), false);
+    assert.equal(equal(Number.NaN, Number.POSITIVE_INFINITY), false);
+    assert.equal(equal(Number.POSITIVE_INFINITY, Number.NaN), false);
+    assert.equal(equal(Number.NaN, Number.NEGATIVE_INFINITY), false);
+    assert.equal(equal(Number.NEGATIVE_INFINITY, Number.NaN), false);
+    // floating point numbers
+    assert.equal(equal(0.3 - 0.2, 0.1), true);
   });
 
   it('should compare two booleans', function() {
@@ -52,7 +74,9 @@ describe('equal', function() {
   it('should compare mixed booleans and bignumbers', function() {
     assert.equal(equal(bignumber(0.1), true), false);
     assert.equal(equal(bignumber(1), true), true);
+    assert.equal(equal(bignumber(1), false), false);
     assert.equal(equal(false, bignumber(0)), true);
+    assert.equal(equal(true, bignumber(0)), false);
   });
 
   it('should compare two complex numbers correctly', function() {
@@ -81,6 +105,13 @@ describe('equal', function() {
     //assert.equal(equal(unit('2.54cm'), unit('1inch')), true); // round-off error :(
   });
 
+  it('should apply configuration option epsilon', function() {
+    var mymath = mathjs();
+    assert.equal(mymath.equal(1, 0.991), false);
+    mymath.config({epsilon: 1e-2});
+    assert.equal(mymath.equal(1, 0.991), true);
+  });
+
   it('should throw an error when comparing a unit with a big number', function() {
     assert.throws( function () {equal(math.unit('5 m'), bignumber(10)).toString() });
   });
@@ -89,10 +120,19 @@ describe('equal', function() {
     assert.throws(function () {equal(unit('100cm'), 22)});
   });
 
+  it('should throw an error for two measures of different units', function() {
+    assert.throws(function () {equal(math.unit(5, 'km'), math.unit(100, 'gram'));});
+  });
+
   it('should compare two strings correctly', function() {
     assert.equal(equal('0', 0), true);
     assert.equal(equal('Hello', 'hello'), false);
     assert.equal(equal('hello', 'hello'), true);
+  });
+
+  it('should compare a string an matrix elementwise', function() {
+    assert.deepEqual(equal('B', ['A', 'B', 'C']), [false, true, false]);
+    assert.deepEqual(equal(['A', 'B', 'C'], 'B'), [false, true, false]);
   });
 
   it('should compare two matrices correctly', function() {
@@ -104,5 +144,9 @@ describe('equal', function() {
     assert.throws(function () {equal([1,4,5], [3,4])});
   });
 
+  it('should throw an error in case of invalid number of arguments', function() {
+    assert.throws(function () {equal(1)}, error.ArgumentsError);
+    assert.throws(function () {equal(1, 2, 3)}, error.ArgumentsError);
+  });
 
 });

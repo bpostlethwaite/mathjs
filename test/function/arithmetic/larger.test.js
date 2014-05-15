@@ -1,6 +1,8 @@
 // test larger
 var assert = require('assert'),
-    math = require('../../../index')(),
+    mathjs = require('../../../index'),
+    math = mathjs(),
+    error = require('../../../lib/error/index'),
     bignumber = math.bignumber,
     complex = math.complex,
     matrix = math.matrix,
@@ -16,6 +18,20 @@ describe('larger', function() {
     assert.equal(larger(-2, 2), false);
     assert.equal(larger(-2, -3), true);
     assert.equal(larger(-3, -2), false);
+  });
+
+  it('should compare two floating point numbers correctly', function() {
+    // Infinity
+    assert.equal(larger(Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY), false);
+    assert.equal(larger(Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY), false);
+    assert.equal(larger(Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY), true);
+    assert.equal(larger(Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY), false);
+    assert.equal(larger(Number.POSITIVE_INFINITY, 2.0), true);
+    assert.equal(larger(2.0, Number.POSITIVE_INFINITY), false);
+    assert.equal(larger(Number.NEGATIVE_INFINITY, 2.0), false);
+    assert.equal(larger(2.0, Number.NEGATIVE_INFINITY), true);
+    // floating point numbers
+    assert.equal(larger(0.3 - 0.2, 0.1), false);
   });
 
   it('should compare two booleans', function() {
@@ -51,7 +67,9 @@ describe('larger', function() {
   it('should compare mixed booleans and bignumbers', function() {
     assert.equal(larger(bignumber(0.1), true), false);
     assert.equal(larger(bignumber(1), true), false);
+    assert.equal(larger(bignumber(1), false), true);
     assert.equal(larger(false, bignumber(0)), false);
+    assert.equal(larger(true, bignumber(0)), true);
   });
 
   it('should add two measures of the same unit', function() {
@@ -61,8 +79,19 @@ describe('larger', function() {
     assert.equal(larger(unit('101cm'), unit('1m')), true);
   });
 
+  it('should apply configuration option epsilon', function() {
+    var mymath = mathjs();
+    assert.equal(mymath.larger(1, 0.991), true);
+    mymath.config({epsilon: 1e-2});
+    assert.equal(mymath.larger(1, 0.991), false);
+  });
+
   it('should throw an error if comparing a unit with a number', function() {
     assert.throws(function () {larger(unit('100cm'), 22)});
+  });
+
+  it('should throw an error for two measures of different units', function() {
+    assert.throws(function () {larger(math.unit(5, 'km'), math.unit(100, 'gram'));});
   });
 
   it('should throw an error if comparing a unit with a bignumber', function() {
@@ -75,6 +104,11 @@ describe('larger', function() {
     assert.equal(larger('abd', 'abc'), true);
     assert.equal(larger('abc', 'abc'), false);
     assert.equal(larger('abc', 'abd'), false);
+  });
+
+  it('should compare a string an matrix elementwise', function() {
+    assert.deepEqual(larger('B', ['A', 'B', 'C']), [true, false, false]);
+    assert.deepEqual(larger(['A', 'B', 'C'], 'B'), [false, false, true]);
   });
 
   it('should perform element-wise comparison for two matrices of same size', function() {
@@ -92,6 +126,11 @@ describe('larger', function() {
 
   it('should throw an error if matrices are different sizes', function() {
     assert.throws(function () {larger([1,4,6], [3,4])});
+  });
+
+  it('should throw an error in case of invalid number of arguments', function() {
+    assert.throws(function () {larger(1)}, error.ArgumentsError);
+    assert.throws(function () {larger(1, 2, 3)}, error.ArgumentsError);
   });
 
 });

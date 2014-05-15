@@ -1,4 +1,5 @@
 var assert = require('assert'),
+    error = require('../../../lib/error/index'),
     math = require('../../../index')(),
     approx = require('../../../tools/approx'),
     pi = math.pi,
@@ -65,6 +66,11 @@ describe('tan', function() {
 
   it('should return the tan of each element of a matrix', function() {
     approx.deepEqual(tan(matrix([1,2,3])), matrix(tan123));
+  });
+
+  it('should throw an error in case of invalid number of arguments', function() {
+    assert.throws(function () {tan()}, error.ArgumentsError);
+    assert.throws(function () {tan(1, 2)}, error.ArgumentsError);
   });
 
 });

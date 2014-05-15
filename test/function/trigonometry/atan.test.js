@@ -1,4 +1,5 @@
 var assert = require('assert'),
+    error = require('../../../lib/error/index'),
     math = require('../../../index')(),
     approx = require('../../../tools/approx'),
     pi = math.pi,
@@ -60,6 +61,11 @@ describe('atan', function() {
     var atan123 = [0.785398163397448, 1.107148717794090, 1.249045772398254];
     approx.deepEqual(atan([1,2,3]), atan123);
     approx.deepEqual(atan(matrix([1,2,3])), matrix(atan123));
+  });
+
+  it('should throw an error in case of invalid number of arguments', function() {
+    assert.throws(function () {atan()}, error.ArgumentsError);
+    assert.throws(function () {atan(1, 2)}, error.ArgumentsError);
   });
 
 });

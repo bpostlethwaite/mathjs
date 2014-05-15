@@ -1,5 +1,6 @@
 // test atan2
 var assert = require('assert'),
+    error = require('../../../lib/error/index'),
     math = require('../../../index')(),
     approx = require('../../../tools/approx'),
     pi = math.pi,
@@ -77,6 +78,11 @@ describe('atan2', function() {
         matrix([0.25, 0, -0.75]));
     approx.equal(atan2(0, 2) / pi, 0);
     approx.equal(atan2(0, -2) / pi, 1);
+  });
+
+  it('should throw an error in case of invalid number of arguments', function() {
+    assert.throws(function () {atan2(1)}, error.ArgumentsError);
+    assert.throws(function () {atan2(1, 2, 3)}, error.ArgumentsError);
   });
 
 });

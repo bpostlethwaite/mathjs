@@ -1,6 +1,7 @@
 // test sign
 var assert = require('assert'),
     approx = require('../../../tools/approx'),
+    error = require('../../../lib/error/index'),
     math = require('../../../index')(),
     bignumber = math.bignumber;
 
@@ -40,6 +41,11 @@ describe('sign', function() {
 
   it('should return a matrix of the signs of each elements in the given matrix', function() {
     assert.deepEqual(math.sign(math.matrix([-2,-1,0,1,2])), math.matrix([-1,-1,0,1,1]));
+  });
+
+  it('should throw an error in case of invalid number of arguments', function() {
+    assert.throws(function () {math.sign()}, error.ArgumentsError);
+    assert.throws(function () {math.sign(1, 2)}, error.ArgumentsError);
   });
 
 });

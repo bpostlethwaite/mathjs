@@ -1,4 +1,5 @@
 var assert = require('assert'),
+    error = require('../../../lib/error/index'),
     math = require('../../../index')(),
     approx = require('../../../tools/approx'),
     pi = math.pi,
@@ -72,6 +73,11 @@ describe('sec', function() {
 
   it('should return the secant of each element of a matrix', function() {
     approx.deepEqual(sec(matrix([1,2,3])), matrix(sec123));
+  });
+
+  it('should throw an error in case of invalid number of arguments', function() {
+    assert.throws(function () {sec()}, error.ArgumentsError);
+    assert.throws(function () {sec(1, 2)}, error.ArgumentsError);
   });
 
 });

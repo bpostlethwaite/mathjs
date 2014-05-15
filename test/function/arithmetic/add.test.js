@@ -1,6 +1,7 @@
 // test add
 var assert = require('assert'),
     approx = require('../../../tools/approx'),
+    error = require('../../../lib/error/index'),
     math = require('../../../index')(),
     bignumber = math.bignumber,
     add = math.add;
@@ -44,7 +45,9 @@ describe('add', function() {
 
   it('should add mixed booleans and bignumbers', function() {
     assert.deepEqual(add(bignumber(0.1), true), bignumber(1.1));
+    assert.deepEqual(add(bignumber(0.1), false), bignumber(0.1));
     assert.deepEqual(add(false, bignumber(0.2)), bignumber(0.2));
+    assert.deepEqual(add(true, bignumber(0.2)), bignumber(1.2));
   });
 
   it('should add mixed complex numbers and bignumbers', function() {
@@ -68,10 +71,33 @@ describe('add', function() {
     });
   });
 
+  it('should throw an error when one of the two units has undefined value', function() {
+    assert.throws(function () {
+      add(math.unit('km'), math.unit('5gram'));
+    }, /Parameter x contains a unit with undefined value/);
+    assert.throws(function () {
+      add(math.unit('5 km'), math.unit('gram'));
+    }, /Parameter y contains a unit with undefined value/);
+  });
+
+  it('should throw an error in case of a unit and non-unit argument', function() {
+    assert.throws(function () {add(math.unit('5cm'), 2)}, math.error.UnsupportedTypeError);
+    assert.throws(function () {add(math.unit('5cm'), new Date())}, math.error.UnsupportedTypeError);
+    assert.throws(function () {add(new Date(), math.unit('5cm'))}, math.error.UnsupportedTypeError);
+  });
+
   it('should concatenate two strings', function() {
     assert.equal(add('hello ', 'world'), 'hello world');
     assert.equal(add('str', 123), 'str123');
     assert.equal(add(123, 'str'), '123str');
+  });
+
+  it('should concatenate strings and matrices element wise', function() {
+    assert.deepEqual(add('A', ['B', 'C']), ['AB', 'AC']);
+    assert.deepEqual(add(['B', 'C'], 'A'), ['BA', 'CA']);
+
+    assert.deepEqual(add('A', math.matrix(['B', 'C'])), math.matrix(['AB', 'AC']));
+    assert.deepEqual(add(math.matrix(['B', 'C']), 'A'), math.matrix(['BA', 'CA']));
   });
 
   it('should add matrices correctly', function() {
@@ -104,6 +130,11 @@ describe('add', function() {
 
     assert.ok(c instanceof math.type.Matrix);
     assert.deepEqual(c, math.matrix([4,4,4]));
+  });
+
+  it('should throw an error in case of invalid number of arguments', function() {
+    assert.throws(function () {add(1)}, error.ArgumentsError);
+    assert.throws(function () {add(1, 2, 3)}, error.ArgumentsError);
   });
 
 });

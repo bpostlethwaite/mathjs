@@ -1,4 +1,5 @@
 var assert = require('assert'),
+    error = require('../../../lib/error/index'),
     math = require('../../../index')(),
     conj = math.conj;
 
@@ -40,6 +41,11 @@ describe('conj', function() {
 
   it('should be identity if used with a unit', function() {
     assert.deepEqual(conj(math.unit('5cm')), math.unit('5cm'));
+  });
+
+  it('should throw an error in case of invalid number of arguments', function() {
+    assert.throws(function () {conj()}, error.ArgumentsError);
+    assert.throws(function () {conj(1, 2)}, error.ArgumentsError);
   });
 
 });

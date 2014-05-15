@@ -1,4 +1,5 @@
 var assert = require('assert'),
+    error = require('../../../lib/error/index'),
     math = require('../../../index')(),
     approx = require('../../../tools/approx'),
     pi = math.pi,
@@ -63,6 +64,11 @@ describe('cot', function() {
 
   it('should return the cotan of each element of a matrix', function() {
     approx.deepEqual(cot(matrix([1,2,3])), matrix(cot123));
+  });
+
+  it('should throw an error in case of invalid number of arguments', function() {
+    assert.throws(function () {cot()}, error.ArgumentsError);
+    assert.throws(function () {cot(1, 2)}, error.ArgumentsError);
   });
 
 });

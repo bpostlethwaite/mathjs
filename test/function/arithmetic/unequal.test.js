@@ -1,6 +1,8 @@
 // test equal
 var assert = require('assert'),
-    math = require('../../../index')(),
+    error = require('../../../lib/error/index'),
+    mathjs = require('../../../index'),
+    math = mathjs(),
     bignumber = math.bignumber,
     complex = math.complex,
     matrix = math.matrix,
@@ -14,6 +16,26 @@ describe('unequal', function() {
     assert.equal(unequal(2, 2), false);
     assert.equal(unequal(0, 0), false);
     assert.equal(unequal(-2, 2), true);
+  });
+
+  it('should compare two floating point numbers correctly', function() {
+    // NaN
+    assert.equal(unequal(Number.NaN, Number.NaN), true);
+    // Infinity
+    assert.equal(unequal(Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY), false);
+    assert.equal(unequal(Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY), false);
+    assert.equal(unequal(Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY), true);
+    assert.equal(unequal(Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY), true);
+    assert.equal(unequal(Number.POSITIVE_INFINITY, 2.0), true);
+    assert.equal(unequal(2.0, Number.POSITIVE_INFINITY), true);
+    assert.equal(unequal(Number.NEGATIVE_INFINITY, 2.0), true);
+    assert.equal(unequal(2.0, Number.NEGATIVE_INFINITY), true);
+    assert.equal(unequal(Number.NaN, Number.POSITIVE_INFINITY), true);
+    assert.equal(unequal(Number.POSITIVE_INFINITY, Number.NaN), true);
+    assert.equal(unequal(Number.NaN, Number.NEGATIVE_INFINITY), true);
+    assert.equal(unequal(Number.NEGATIVE_INFINITY, Number.NaN), true);
+    // floating point numbers
+    assert.equal(unequal(0.3 - 0.2, 0.1), false);
   });
 
   it('should compare two booleans', function() {
@@ -52,7 +74,11 @@ describe('unequal', function() {
   it('should compare mixed booleans and bignumbers', function() {
     assert.deepEqual(unequal(bignumber(0.1), true), true);
     assert.deepEqual(unequal(bignumber(1), true), false);
+    assert.deepEqual(unequal(bignumber(1), false), true);
+    assert.deepEqual(unequal(bignumber(0), false), false);
     assert.deepEqual(unequal(false, bignumber(0)), false);
+    assert.deepEqual(unequal(true, bignumber(0)), true);
+    assert.deepEqual(unequal(true, bignumber(1)), false);
   });
 
   it('should compare two complex numbers correctly', function() {
@@ -81,6 +107,13 @@ describe('unequal', function() {
     //assert.equal(unequal(unit('2.54cm'), unit('1inch')), false); // round-off error :(
   });
 
+  it('should apply configuration option epsilon', function() {
+    var mymath = mathjs();
+    assert.equal(mymath.unequal(1, 0.991), true);
+    mymath.config({epsilon: 1e-2});
+    assert.equal(mymath.unequal(1, 0.991), false);
+  });
+
   it('should throw an error when comparing numbers and units', function() {
     assert.throws(function () {unequal(unit('100cm'), 22)});
     assert.throws(function () {unequal(22, unit('100cm'))});
@@ -91,10 +124,19 @@ describe('unequal', function() {
     assert.throws(function () {unequal(bignumber(22), unit('100cm'))});
   });
 
+  it('should throw an error for two measures of different units', function() {
+    assert.throws(function () {unequal(math.unit(5, 'km'), math.unit(100, 'gram'));});
+  });
+
   it('should compare two strings correctly', function() {
     assert.equal(unequal('0', 0), false);
     assert.equal(unequal('Hello', 'hello'), true);
     assert.equal(unequal('hello', 'hello'), false);
+  });
+
+  it('should compare a string an matrix elementwise', function() {
+    assert.deepEqual(unequal('B', ['A', 'B', 'C']), [true, false, true]);
+    assert.deepEqual(unequal(['A', 'B', 'C'], 'B'), [true, false, true]);
   });
 
   it('should perform element-wise comparison of two matrices of the same size', function() {
@@ -104,6 +146,11 @@ describe('unequal', function() {
 
   it('should throw an error when comparing two matrices of different sizes', function() {
     assert.throws(function () {unequal([1,4,5], [3,4])});
+  });
+
+  it('should throw an error in case of invalid number of arguments', function() {
+    assert.throws(function () {unequal(1)}, error.ArgumentsError);
+    assert.throws(function () {unequal(1, 2, 3)}, error.ArgumentsError);
   });
 
 });
