@@ -1,6 +1,6 @@
 var assert = require('assert'),
     error = require('../../../lib/error/index'),
-    math = require('../../../index')(),
+    math = require('../../../index'),
     subset = math.subset,
     matrix = math.matrix,
     range = math.range,
@@ -26,6 +26,14 @@ describe('subset', function() {
   it('should get the right subset of a matrix', function() {
     assert.deepEqual(subset(b, index([0,2], 1)), matrix([[2],[4]]));
     assert.deepEqual(subset(b, index(1, 0)), 3);
+  });
+
+  it('should get a subset of a matrix returning a null or undefined value', function() {
+    assert.deepEqual(subset([0], index(0)), 0);
+    assert.deepEqual(subset([null], index(0)), null);
+    assert.deepEqual(subset([undefined], index(0)), undefined);
+
+    assert.deepEqual(subset([null, undefined], index([0,2])), [null, undefined]);
   });
 
   it('should throw an error if trying to access an invalid subset of a matrix', function() {

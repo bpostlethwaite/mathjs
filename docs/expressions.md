@@ -47,9 +47,6 @@ assigned variables or function.
 The following code demonstrates how to evaluate expressions.
 
 ```js
-// create an instance of math.js
-var math = require('mathjs')();
-
 // evaluate expressions
 math.eval('sqrt(3^2 + 4^2)');           // 5
 math.eval('sqrt(-4)');                  // 2i
@@ -96,9 +93,6 @@ variables or functions. Parameter `scope` is a regular Object.
 Example usage:
 
 ```js
-// create an instance of math.js
-var math = require('mathjs')();
-
 // parse an expression into a node, and evaluate the node
 var code1 = math.compile('sqrt(3^2 + 4^2)');
 code1.eval(); // 5
@@ -133,9 +127,6 @@ variables or functions. Parameter `scope` is a regular Object.
 Example usage:
 
 ```js
-// create an instance of math.js
-var math = require('mathjs')();
-
 // parse an expression into a node, and evaluate the node
 var node1 = math.parse('sqrt(3^2 + 4^2)');
 var code1 = node1.compile(math);
@@ -153,6 +144,18 @@ code2.eval(scope); // 9
 // change a value in the scope and re-evaluate the node
 scope.a = 3;
 code2.eval(scope); // 27
+```
+
+Parsed expressions can be exported to text using `node.toString()`, and can
+be exported to LaTeX using `node.toTex()`. The LaTeX export can be used to 
+pretty print an expression in the browser with a library like 
+[MathJax](http://www.mathjax.org/). Example usage:
+
+```js
+// parse an expression
+var node = math.parse('sqrt(x/x+1)');
+node.toString();  // returns 'sqrt((x / x) + 1)'
+node.toTex();     // returns '\sqrt{ {\frac{x}{x} }+{1} }'
 ```
 
 
@@ -187,9 +190,6 @@ The parser contains the following functions:
 The following code shows how to create and use a parser.
 
 ```js
-// create an instance of math.js
-var math = require('mathjs')();
-
 // create a parser
 var parser = math.parser();
 
@@ -270,7 +270,9 @@ Operator    | Name                    | Syntax      | Associativity | Example   
 `;`         | Row separator           | `[x, y]`    | Left to right | `[1,2;3,4]`           | `[[1,2],[3,4]]`
 `\n`        | Statement separator     | `x \n y`    | Left to right | `a=2 \n b=3 \n a*b`   | `[2,3,6]`
 `+`         | Add                     | `x + y`     | Left to right | `4 + 5`               | `9`
+`+`         | Unary plus              | `+y`        | None          | `+"4"`                | `4`
 `-`         | Subtract                | `x - y`     | Left to right | `7 - 3`               | `4`
+`-`         | Unary minus             | `-y`        | None          | `-4`                  | `-4`
 `*`         | Multiply                | `x * y`     | Left to right | `2 * 3`               | `6`
 `.*`        | Element-wise multiply   | `x .* y`    | Left to right | `[1,2,3] .* [1,2,3]`  | `[1,4,9]`
 `/`         | Divide                  | `x / y`     | Left to right | `6 / 2`               | `3`
@@ -278,7 +280,6 @@ Operator    | Name                    | Syntax      | Associativity | Example   
 `%`, `mod`  | Modulus                 | `x % y`     | Left to right | `8 % 3`               | `2`
 `^`         | Power                   | `x ^ y`     | Right to left | `2 ^ 3`               | `8`
 `.^`        | Element-wise power      | `x .^ y`    | Right to left | `[2,3] .^ [3,3]`      | `[9,27]`
-`-`         | Unary                   | `-y`        | None          | `-4`                  | `-4`
 `'`         | Transpose               | `y'`        | None          | `[[1,2],[3,4]]'`      | `[[1,3],[2,4]]`
 `!`         | Factorial               | `y!`        | None          | `5!`                  | `120`
 `=`         | Assignment              | `x = y`     | Right to left | `a = 5`               | `5`
@@ -300,13 +301,13 @@ Operators                         | Description
 `'`                               | Matrix transpose
 `!`                               | Factorial
 `^`, `.^`                         | Exponentiation
-`-`                               | Unary
+`+`, `-`                          | Unary plus, unary minus
 `x unit`                          | Unit
-`*`, `/`, `.*`, `./`, `%`, `mod`  | Multiply, divide, modulus
+`*`, `/`, `.*`, `./`, `%`, `mod`  | Multiply, divide, modulus, implicit multiply
 `+`, `-`                          | Add, subtract
-`:`                               | Range
-`==`, `!=`, `<`, `>`, `<=`, `>=`  | Comparison
+`==`, `!=`, `<`, `>`, `<=`, `>=`  | Relational
 `to`, `in`                        | Unit conversion
+`:`                               | Range
 `?`, `:`                          | Conditional expression
 `=`                               | Assignment
 `,`                               | Parameter and column separator
@@ -468,10 +469,8 @@ The default number type of the expression parser can be changed at instantiation
 of math.js. The expression parser parses numbers as BigNumber by default:
 
 ```js
-var mathjs = require('mathjs'),
-    math = mathjs({
-      number: 'bignumber' // Default type of number: 'number' (default) or 'bignumber'
-    });
+// Configure the type of number: 'number' (default) or 'bignumber'
+math.config({number: 'bignumber'});
 
 // all numbers are parsed as BigNumber
 math.eval('0.1 + 0.2'); // BigNumber, 0.3
@@ -655,14 +654,44 @@ parser.eval('c[end - 1 : -1 : 2]');   // Matrix, [8, 7, 6]
 An expression can contain multiple lines. Lines can be separated by a newline
 character `\n` or by a semicolon `;`. Output of statements followed by a
 semicolon will be hided from the output, and empty lines are ignored. The
-output is returned as an Array, with an entry for every statement.
+output is returned as a `ResultSet`, with an entry for every visible statement.
 
 ```js
 // a multi line expression
-math.eval('1 * 3 \n 2 * 3 \n 3 * 3');   // Array, [1, 3, 9]
+math.eval('1 * 3 \n 2 * 3 \n 3 * 3');   // ResultSet, [1, 3, 9]
 
 // semicolon statements are hided from the output
-math.eval('a=3; b=4; a + b \n a * b');  // Array, [7, 12]
+math.eval('a=3; b=4; a + b \n a * b');  // ResultSet, [7, 12]
+```
+
+The results can be read from a `ResultSet` via the property `ResultSet.entries`
+which is an `Array`, or by calling `ResultSet.valueOf()`, which returns the 
+array with results.
+
+
+### Implicit multiplication
+
+The expression parser supports implicit multiplication. Implicit multiplication
+has the same precedence as explicit multiplications and divisions, so `3/4 mm`
+is evaluated as `(3 / 4) * mm`. Here some examples:
+
+Expression      | Evaluated as:
+--------------- | ----------------------
+(3 + 2) b       | (3 + 2) * b
+3 / 4 mm        | (3 / 4) * mm
+(1 + 2) (4 - 2) | (1 + 2) * (4 - 2)
+sqrt(2)(4 + 1)  | sqrt(2) * (4 + 1)
+A[2, 3]         | A[2, 3]   # get subset
+(A)[2, 3]       | (A) * [2, 3]
+[2, 3][1, 3]    | [2, 3] * [1, 3]
+
+Implicit multiplication can be tricky as there is ambiguity on how an expression
+is evaluated. Use it carefully.
+
+```js
+math.eval('(1 + 2)(4 - 2)');  // Number, 6
+math.eval('3/4 mm');          // Unit, 0.75 mm
+math.eval('2 + 3i');          // Complex, 2 + 3i
 ```
 
 

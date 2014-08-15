@@ -8,7 +8,7 @@ describe('import', function() {
   var math = null;
 
   beforeEach(function() {
-    math = mathjs();
+    math = mathjs.create();
     math.import({
       myvalue: 42,
       hello: function (name) {
@@ -57,6 +57,26 @@ describe('import', function() {
     math.import({ getSizeNotWrapped: getSize }, { wrap: false });
     assert.equal(math.getSizeNotWrapped([1,2,3]), 3);
     assert.equal(math.getSizeNotWrapped(math.matrix([1,2,3])), undefined);
+  });
+
+  it('wrapped imported functions should accept undefined and null', function () {
+    math.import({
+      isNull: function (obj) {
+        return obj === null;
+      }
+    }, { wrap: true });
+    assert.equal(math.isNull(null), true);
+    assert.equal(math.isNull(0), false);
+
+    math.import({
+      isUndefined: function (obj) {
+        return obj === undefined;
+      }
+    }, { wrap: true });
+    assert.equal(math.isUndefined(undefined), true);
+    assert.equal(math.isUndefined(0), false);
+    assert.equal(math.isUndefined(null), false);
+
   });
 
   it('should extend math with numbers', function() {

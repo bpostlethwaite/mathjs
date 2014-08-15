@@ -1,7 +1,7 @@
 // test xgcd
 var assert = require('assert'),
     error = require('../../../lib/error/index'),
-    math = require('../../../index')(),
+    math = require('../../../index').create({matrix: 'array'}),
     gcd = math.gcd,
     xgcd = math.xgcd;
 
@@ -37,14 +37,14 @@ describe('xgcd', function() {
     assert.deepEqual([0, 0, 0], xgcd(0, 0));
   });
 
-  it('should calculate xgcd for BigNumbers (downgrades to Number)', function() {
-    assert.deepEqual(xgcd(math.bignumber(65), math.bignumber(40)), [5, -3, 5]);
-    assert.deepEqual(xgcd(math.bignumber(65), math.bignumber(40)), [5, -3, 5]);
+  it('should calculate xgcd for BigNumbers', function() {
+    assert.deepEqual(xgcd(math.bignumber(65), math.bignumber(40)), [math.bignumber(5), math.bignumber(-3), math.bignumber(5)]);
+    assert.deepEqual(xgcd(math.bignumber(65), math.bignumber(40)), [math.bignumber(5), math.bignumber(-3), math.bignumber(5)]);
   });
 
-  it('should calculate xgcd for mixed BigNumbers to Numbers (downgrades to Number)', function() {
-    assert.deepEqual(xgcd(math.bignumber(65), 40), [5, -3, 5]);
-    assert.deepEqual(xgcd(65, math.bignumber(40)), [5, -3, 5]);
+  it('should calculate xgcd for mixed BigNumbers and Numbers', function() {
+    assert.deepEqual(xgcd(math.bignumber(65), 40), [math.bignumber(5), math.bignumber(-3), math.bignumber(5)]);
+    assert.deepEqual(xgcd(65, math.bignumber(40)), [math.bignumber(5), math.bignumber(-3), math.bignumber(5)]);
   });
 
   it.skip ('should calculate xgcd for edge cases with negative values', function () {
@@ -70,6 +70,14 @@ describe('xgcd', function() {
     assert.equal(gcd(1239, 735), xgcd(1239, 735)[0]);
     assert.equal(gcd(105, 252),  xgcd(105, 252)[0]);
     assert.equal(gcd(7, 13),     xgcd(7, 13)[0]);
+  });
+
+  it('should return a matrix when configured to use matrices', function() {
+    var math1 = math.create({matrix: 'matrix'});
+    assert.deepEqual(math1.xgcd(65, 40), math.matrix([5, -3, 5]));
+
+    var math2 = math.create({matrix: 'array'});
+    assert.deepEqual(math2.xgcd(65, 40), [5, -3, 5]);
   });
 
   it('should throw an error if used with wrong number of arguments', function() {
