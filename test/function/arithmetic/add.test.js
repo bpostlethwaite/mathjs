@@ -2,7 +2,7 @@
 var assert = require('assert'),
     approx = require('../../../tools/approx'),
     error = require('../../../lib/error/index'),
-    math = require('../../../index')(),
+    math = require('../../../index'),
     bignumber = math.bignumber,
     add = math.add;
 
@@ -20,6 +20,12 @@ describe('add', function() {
     assert.equal(add(true, false), 1);
     assert.equal(add(false, true), 1);
     assert.equal(add(false, false), 0);
+  });
+
+  it('should add numbers and null', function () {
+    assert.equal(math.add(null, null), 0);
+    assert.equal(math.add(null, 1), 1);
+    assert.equal(math.add(1, null), 1);
   });
 
   it('should add mixed numbers and booleans', function() {
