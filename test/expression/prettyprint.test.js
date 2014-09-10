@@ -59,6 +59,11 @@ describe('prettyprint', function() {
       var res = math.prettyprint(funcStr, scope)
       assert.equal(res, "(12.0) + (2.00)*e^(x + 1)")
 
+      var funcStr = 'frank*sin(BOB*---x)';
+      var scope = {frank : 2.1, BOB : -2};
+      var res = math.prettyprint(funcStr, scope)
+      assert.equal(res, "(2.10)*sin((-2.00)*(---x))")
+
   });
 
   it ('should substitute scope variables and simplify', function () {
